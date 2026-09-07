@@ -158,6 +158,13 @@
   function loadMarketingPixels() {
     if (!window.ZF_META_PIXEL_ID) return;
     if (window.zfPixelLoaded) return;
+    // A page can opt out of Meta entirely by setting this flag in its head, before this script
+    // runs. /start/ and /start/thanks/ do (the friends lane, memory zerofog-friends-lane-lena):
+    // people the founders know, in Spain and Ukraine, must not teach the optimizer what a
+    // visitor or a buyer looks like before ads resume. PostHog below is not affected - the lane
+    // is still measured, just not by Meta. Consent 'all' on those pages therefore loads
+    // analytics only.
+    if (window.ZF_NO_META_PIXEL) return;
 
     // Standard Meta Pixel bootstrap.
     !function(f,b,e,v,n,t,s)

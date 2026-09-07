@@ -26,7 +26,29 @@ const TOS_CONSENT_MESSAGE =
   'thereby lose my EU 14-day right of withdrawal. This does not affect the ' +
   '30-day guarantee described in the [Refund Policy](https://thezerofog.com/refunds/).';
 
-function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon) {
+// Where a checkout was opened from, and therefore where its buyer lands afterwards.
+//
+// 'friends' is the lane for people forwarded a personal message by someone who knows the
+// founders (memory zerofog-friends-lane-lena, plan T-081). Its tracking is the address itself:
+// anything opened from /start/ is that lane, no code, no coupon, no visible referral. The lane
+// differs from the ad funnel in exactly three places, all keyed off this one metadata value:
+// the buyer lands on /start/thanks/ (the workshop recording, watched AFTER paying, instead of
+// /welcome/), stripe-webhook.js sends no Purchase to Meta for it (buyers from Spain and Ukraine
+// must not teach the optimizer before ads resume), and scripts/friends-report.mjs sums it for
+// the monthly share. Everything else - price, enrollment, E14, the boards - is identical.
+//
+// Allow-listed, never echoed: a stranger's POST with a made-up source gets the default lane.
+const LANES = {
+  sales_page: { successPath: '/welcome/', cancelPath: '/sales/' },
+  friends: { successPath: '/start/thanks/', cancelPath: '/start/' },
+};
+
+function laneFor(source) {
+  return Object.prototype.hasOwnProperty.call(LANES, source) ? source : 'sales_page';
+}
+
+export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon, source) {
+  const lane = LANES[laneFor(source)];
   // Stripe expects bracket notation for nested and array params. URLSearchParams
   // encodes the literal {CHECKOUT_SESSION_ID} template braces as %7B...%7D,
   // which Stripe accepts and replaces server-side.
@@ -34,10 +56,10 @@ function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon) {
   params.set('mode', 'payment');
   params.set('line_items[0][price]', priceId);
   params.set('line_items[0][quantity]', '1');
-  params.set('success_url', `${baseUrl}/welcome/?session_id={CHECKOUT_SESSION_ID}`);
-  params.set('cancel_url', `${baseUrl}/sales/`);
-  // Extensible metadata — a later task can add lead_id/source without restructuring.
-  params.set('metadata[source]', 'sales_page');
+  params.set('success_url', `${baseUrl}${lane.successPath}?session_id={CHECKOUT_SESSION_ID}`);
+  params.set('cancel_url', `${baseUrl}${lane.cancelPath}`);
+  // The lane, written server-side on a session Stripe then signs - the webhook trusts it.
+  params.set('metadata[source]', laneFor(source));
   // Expire abandoned checkouts after 2 hours (Stripe allows 30min-24h, default 24h).
   // The `checkout.session.expired` webhook is what triggers the E18 abandoned-checkout
   // email — with the default expiry it would arrive a full day late.
@@ -60,7 +82,10 @@ function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon) {
   if (compCoupon) {
     params.set('discounts[0][coupon]', compCoupon);
     params.set('metadata[zf_comp]', 'granted');
-    params.set('metadata[source]', 'comp_link');
+    // A comp keeps the lane it was opened for, so a comped walk through /start/ lands on
+    // /start/thanks/ and exercises the same webhook branch a paid friend would. `zf_comp` is
+    // what marks it as a comp; `source` stays the lane.
+    if (laneFor(source) === 'sales_page') params.set('metadata[source]', 'comp_link');
   }
   return params;
 }
@@ -102,7 +127,9 @@ export default async function handler(req) {
   // Gated on COMP_ACCESS_KEY, compared in full. Nothing about the normal POST path changes,
   // and no promotion-code field ever appears for a real buyer.
   if (req.method === 'GET') {
-    const key = new URL(req.url).searchParams.get('key') || '';
+    const query = new URL(req.url).searchParams;
+    const key = query.get('key') || '';
+    const compSource = query.get('source') || '';
     const expected = process.env.COMP_ACCESS_KEY || '';
     const coupon = process.env.COMP_COUPON_ID || '';
     if (!expected || !coupon || key !== expected) {
@@ -113,7 +140,7 @@ export default async function handler(req) {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    const made = await createSession(secretKey, priceId, baseUrl, coupon);
+    const made = await createSession(secretKey, priceId, baseUrl, coupon, compSource);
     if (!made.url) {
       // Whoever holds the key is us, and a silent 500 on an admin link is a dead end -
       // Stripe's own sentence is what tells you which dashboard switch is off.
@@ -143,7 +170,16 @@ export default async function handler(req) {
     });
   }
 
-  const { url } = await createSession(secretKey, priceId, baseUrl, null);
+  // The only thing read from the body. Anything but an allow-listed lane is the default one.
+  let source = '';
+  try {
+    const body = await req.json();
+    if (body && typeof body.source === 'string') source = body.source;
+  } catch {
+    // An empty or non-JSON body is the sales page's own call ('{}' until 2026-09-07) - default lane.
+  }
+
+  const { url } = await createSession(secretKey, priceId, baseUrl, null, source);
   if (!url) {
     return new Response(JSON.stringify({ error: 'Could not create checkout session' }), {
       status: 500,
@@ -163,7 +199,7 @@ export default async function handler(req) {
  * tester travels the same session shape a buyer does, minus the price. Errors are logged
  * in full server-side and never leak to the caller.
  */
-async function createSession(secretKey, priceId, baseUrl, compCoupon) {
+async function createSession(secretKey, priceId, baseUrl, compCoupon, source) {
   // A zero-total session needs Stripe API 2023-08-16 or later ("no-cost orders"); this
   // account predates that, so its default version would reject the comp. Pinned on the comp
   // call ONLY - the selling path keeps the exact version that has already taken a real sale,
@@ -177,7 +213,7 @@ async function createSession(secretKey, priceId, baseUrl, compCoupon) {
         'Content-Type': 'application/x-www-form-urlencoded',
         ...versionHeader,
       },
-      body: buildSessionParams(priceId, baseUrl, true, compCoupon).toString(),
+      body: buildSessionParams(priceId, baseUrl, true, compCoupon, source).toString(),
     });
 
     let session = await stripeRes.json();
@@ -193,7 +229,7 @@ async function createSession(secretKey, priceId, baseUrl, compCoupon) {
           'Authorization': 'Bearer ' + secretKey,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: buildSessionParams(priceId, baseUrl, false, compCoupon).toString(),
+        body: buildSessionParams(priceId, baseUrl, false, compCoupon, source).toString(),
       });
       session = await stripeRes.json();
     }

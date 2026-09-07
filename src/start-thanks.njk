@@ -1,0 +1,162 @@
+---
+title: "You're in - The Zero Fog"
+permalink: /start/thanks/
+---
+{% extends "layouts/base.njk" %}
+
+{# The success page of the friends lane (memory zerofog-friends-lane-lena, plan T-081). Reached
+   ONLY as create-checkout's success_url for a checkout opened from /start/ - the ad funnel's
+   buyers keep landing on /welcome/. Two differences from /welcome/, both deliberate:
+
+   1. The workshop recording is shown HERE, after paying, as "watch this first" - this lane has
+      no opt-in, no slot and no hour-long session before the purchase. The player stops at the
+      point where the recorded session turns to the offer (slide 94, 50:59 on the master's own
+      caption track: "All right, what if it doesn't work?") - a buyer has already taken it. The
+      cut is a cap on THIS player only; the master file is untouched, and the workshop room and
+      the email replay keep the full 58 minutes (CEO 07.09.2026).
+   2. No Meta pixel, and no Purchase to Meta: people the founders know, in countries no ad
+      targets, must not teach the optimizer before ads resume. PostHog still measures the page. #}
+
+{% block head_extras %}
+<meta name="robots" content="noindex">
+<meta name="description" content="Your enrollment is confirmed. Welcome to The Zero Fog.">
+<script>window.ZF_NO_META_PIXEL = true;</script>
+{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ '/assets/css/pages/welcome-2.css' | v }}">
+<style>
+  .session-video { width: 100%; max-width: 640px; margin-bottom: 16px; }
+  .session-video video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid var(--border-accent); background: #0d0d0d; }
+  .session-note { font-size: 0.85rem; color: var(--muted); line-height: 1.6; max-width: 560px; text-align: center; margin-bottom: 48px; }
+  .session-heading { font-size: 0.7rem; color: var(--accent); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 700; text-align: center; }
+  .session-end { display: none; font-size: 0.95rem; color: var(--text); line-height: 1.6; max-width: 560px; text-align: center; margin: 0 auto 48px; }
+  .session-end.is-shown { display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<a href="/" class="brand">The Zero Fog</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Light</button>
+
+<section class="page-center">
+
+  <div class="checkmark">&#10003;</div>
+
+  <h1>You're in. Good call.</h1>
+
+  {# Verbatim from /welcome/ - the promise repeated where the buyer can still doubt the decision. #}
+  <p class="promise">You just stopped treating the fog as normal. Everything from here is built around one thing - sharp hours stop being the exception.</p>
+
+  <p class="subtitle">Enrollment confirmed - you're one of the founding members. Your login is on its way by email. Before you open the course, watch this.</p>
+
+  <p class="session-heading">Watch this first - the session</p>
+
+  {# Plain scrubbable player, on purpose: this is a recording a buyer owns, not a live room.
+     The media fragment (#t=0,3058) makes the browser stop at the cap natively; the script below
+     is the second lock for browsers that ignore fragments or for a scrub past the end. #}
+  <div class="session-video">
+    <video id="sessionVid" controls playsinline preload="metadata"
+           controlslist="nodownload" disablepictureinpicture
+           poster="/assets/img/replay-poster.jpg">
+      <source src="https://d1yei2z3i6k35z.cloudfront.net/17244934/6a832c1d0fc977.60695874_FullWebV2-refund-fixed.mp4#t=0,3058" type="video/mp4">
+      <track kind="captions" src="/assets/captions/workshop-v2.vtt" srclang="en" label="English">
+    </video>
+  </div>
+  <p class="session-note">This is the session everyone else sees before they decide. You already decided, so it stops where the offer begins. Scrub, pause, come back to it - it stays open.</p>
+  <p class="session-end" id="sessionEnd">That's the end of the session. The part after this was the offer - the one you already took. Your next step is below.</p>
+
+  <div class="next-steps">
+    <p class="next-steps-heading">Next Steps</p>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <div class="step-body">
+        <p class="step-title">Check your email</p>
+        <p class="step-text">Your course login usually lands within 2 minutes, in an email titled "Important: Your access to training". Not there in 5? Check Promotions or Spam.</p>
+        <p class="step-sub">Your course home: <a href="https://thezerofog.com/course" class="accent-link">thezerofog.com/course</a> - worth bookmarking.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <div class="step-body">
+        <p class="step-title">Open your Toolkit - it's live now</p>
+        <p class="step-text"><a href="https://thezerofog.com/app/" class="accent-link">thezerofog.com/app/</a></p>
+        <p class="step-text">Sign in with the email you bought with - a login code arrives in seconds.</p>
+        <p class="step-sub">Inside: your Diary, Assessment, Protocol Card, and all three bonuses.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <div class="step-body">
+        <p class="step-title">Start with How To Use &amp; Resources</p>
+        <p class="step-text">It's the top section in the course. The welcome video and the tour show you how everything works - nothing to figure out on your own.</p>
+        <p class="step-sub">Everything is open from day one - the four weeks of the protocol, plus a fifth week to lock it in. No drip, no waiting.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="statement-note">
+    <p>One housekeeping thing: on your bank statement this charge will show as <strong>THEZEROFOG.COM</strong> (or just <strong>ZEROFOG</strong> on some cards). That's us.</p>
+  </div>
+
+  <div class="expectations">
+    <h3>What To Expect Next</h3>
+    <div class="exp-row">
+      <p class="exp-label">From me</p>
+      <p class="exp-text">A few short emails, written by hand, not by a machine: where to start, and a handful of questions at the end of week one and at the end. Timed to where you actually are - your pace, not a calendar.</p>
+    </div>
+    <div class="exp-row">
+      <p class="exp-label">Back to me</p>
+      <p class="exp-text">Reply to any of them - they come straight to me, and what you tell me is what shapes the next version of the course.</p>
+    </div>
+  </div>
+
+  <div class="support-box">
+    <p>Questions? Write me direct at <a href="mailto:kirill@thezerofog.com" class="accent-link">kirill@thezerofog.com</a>. As a founding member, you have a direct line - we'll find the right pace together.</p>
+  </div>
+
+  <p class="disclaimer">This is an educational program, not medical treatment. Results vary.</p>
+
+</section>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+(function () {
+  // Slide 94 on the master's own caption track: 50:59.081 "All right, what if it doesn't work?"
+  // is where the recorded session turns to the offer. The cap sits one second before it, on the
+  // pause after "The course is just the vehicle." Change this number and nothing else if the
+  // master is ever re-cut - the room's durationSec (3488) is a different file setting and is
+  // deliberately NOT read here.
+  var CAP = 3058;
+  var v = document.getElementById('sessionVid');
+  var end = document.getElementById('sessionEnd');
+  if (!v) return;
+
+  v.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  function hold() {
+    if (v.currentTime < CAP) return false;
+    v.pause();
+    v.currentTime = CAP;
+    if (end) end.classList.add('is-shown');
+    return true;
+  }
+  v.addEventListener('timeupdate', hold);
+  v.addEventListener('seeking', hold);
+  v.addEventListener('play', function () {
+    // "Play" at the cap restarts from the top rather than into the offer.
+    if (v.currentTime >= CAP - 0.5) v.currentTime = 0;
+    if (end) end.classList.remove('is-shown');
+  });
+  if (window.posthog && window.posthog.capture) {
+    v.addEventListener('play', function () { window.posthog.capture('friends_session_started'); }, { once: true });
+  }
+})();
+</script>
+{% endblock %}

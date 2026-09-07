@@ -443,7 +443,7 @@ async function readSaleContext(email) {
  * Sent last, after enrollment, provisioning and the welcome email, so it can report what each
  * of them actually did rather than promising them.
  */
-async function alertSale(email, session, { appProvisioned, welcomed }) {
+async function alertSale(email, session, { appProvisioned, welcomed, lane }) {
   const ctx = await readSaleContext(email);
   const d = session.customer_details || {};
   const a = d.address || {};
@@ -465,7 +465,9 @@ async function alertSale(email, session, { appProvisioned, welcomed }) {
     `SALE - ${money}\n\n` +
       `${who(email, d.name)}\n` +
       (place ? `${place}${ctx.timeZone ? ` - ${ctx.timeZone}` : ''}\n` : '') +
-      (from ? `From: ${from}\n` : 'From: no utm on the registration\n') +
+      (lane === 'friends'
+        ? 'From: FRIENDS LANE (/start/) - no Meta event sent, counts toward the monthly share\n'
+        : from ? `From: ${from}\n` : 'From: no utm on the registration\n') +
       (took ? `${took}\n` : '') +
       `\nCourse: open\n` +
       `Toolkit: ${appProvisioned ? 'provisioned' : 'NOT provisioned'}\n` +
@@ -823,7 +825,11 @@ function mondayProductLabel(amountCents) {
 async function mondayRecordPurchase(details) {
   if (!process.env.MONDAY_API_TOKEN) return;
   const { email, name, amountCents, currency, sessionId, chargeOrIntentId,
-          customerId, systemeContactId, appProvisioned, livemode, comp } = details;
+          customerId, systemeContactId, appProvisioned, livemode, comp, lane } = details;
+  // The friends lane has no column of its own on either board (the CEO cut per-buyer fields
+  // down to what a human reads), so the lane rides in the row NAME, where the eye lands first,
+  // and in the money note. scripts/friends-report.mjs reads Stripe, not the board.
+  const laneTag = lane === 'friends' ? ' [friends]' : '';
   const today = new Date().toISOString().slice(0, 10);
   const dollars = Number(amountCents || 0) / 100;
 
@@ -868,7 +874,7 @@ async function mondayRecordPurchase(details) {
         // A comped seat is not a customer and must never be counted as one - SOP, the group
         // that exists because the first charge this business took was Dima's own.
         group: comp ? MG.internal : MG.active,
-        name: name ? `${email} - ${name}` : email,
+        name: (name ? `${email} - ${name}` : email) + laneTag,
         vals: JSON.stringify(customerValues),
       }
     );
@@ -891,7 +897,9 @@ async function mondayRecordPurchase(details) {
     [MM.currency]: String(currency || '').toUpperCase(),
     [MM.stripeId]: moneyKey || '',
     [MM.liveMode]: { label: livemode ? 'Live' : 'Test' },
-    [MM.note]: 'Written by stripe-webhook. Stripe fee and net settled are empty on purpose - they live on the balance transaction and are only known after settlement.',
+    [MM.note]:
+      'Written by stripe-webhook. Stripe fee and net settled are empty on purpose - they live on the balance transaction and are only known after settlement.' +
+      (lane === 'friends' ? ' FRIENDS LANE: bought via /start/; 50 percent of net after fees is owed 30 days after this date unless refunded (scripts/friends-report.mjs).' : ''),
   };
   if (itemId) moneyValues[MM.customer] = { item_ids: [Number(itemId)] };
 
@@ -902,7 +910,7 @@ async function mondayRecordPurchase(details) {
      }`,
     {
       board: MONDAY_BOARD_MONEY,
-      name: `Charge $${dollars} - ${email}`,
+      name: `Charge $${dollars} - ${email}${laneTag}`,
       vals: JSON.stringify(moneyValues),
     }
   );
@@ -1140,6 +1148,14 @@ export default async function handler(req) {
   // paid order on purpose - the whole point of a comp is to travel the real path.
   const isComp = session.metadata?.zf_comp === 'granted' && Number(session.amount_total) === 0;
 
+  // The lane this checkout was opened from - written by create-checkout.js on a session Stripe
+  // then signed, so it cannot be forged from outside. 'friends' is the personal-recommendation
+  // lane (/start/, memory zerofog-friends-lane-lena): same product, same price, same enrollment,
+  // but NO Purchase to Meta - buyers from Spain and Ukraine must not teach the optimizer what a
+  // buyer looks like before ads resume - and a marker on the alert and the boards so the monthly
+  // share can be read. Anything else is the ad funnel.
+  const lane = session.metadata?.source === 'friends' ? 'friends' : 'sales';
+
   // Validate that this is a real, fully-paid order for OUR product. A
   // signature-valid event that fails these checks is acknowledged (200, no retry)
   // but NOT forwarded — we don't want to enroll, nor have Stripe retry.
@@ -1274,6 +1290,7 @@ export default async function handler(req) {
       appProvisioned,
       livemode: event.livemode !== false,
       comp: isComp,
+      lane,
     });
   } catch (err) {
     console.error('[monday] purchase record failed (ignored):', err);
@@ -1289,17 +1306,18 @@ export default async function handler(req) {
   // Meta Conversions API twin of the browser Purchase (see sendMetaPurchase). Comped seats are
   // excluded: a zero-euro internal grant must never teach the optimizer what a buyer looks like.
   // Awaited, best-effort, never affects the response.
-  if (!isComp) await sendMetaPurchase(email, session);
+  if (shouldSendMetaPurchase({ isComp, lane })) await sendMetaPurchase(email, session);
 
   // The one alert that is not about something being broken. Last, so it reports the outcome of
   // every step above instead of firing before they ran.
-  if (!isComp) await alertSale(email, session, { appProvisioned, welcomed });
+  if (!isComp) await alertSale(email, session, { appProvisioned, welcomed, lane });
 
   if (isComp) {
     await alertOperator(
       'COMPED SEAT - course given, no money taken\n\n' +
         `Person: ${who(email, session.customer_details?.name)}\n` +
         `Session: ${session.id}\n` +
+        (lane === 'friends' ? 'Lane: friends (/start/) - landed on /start/thanks/\n' : '') +
         'Opened through the comp link, not a sale. Their row is on the board under ' +
         'Internal - not a customer, and there is no money row, because no euros moved. ' +
         'If this address was NOT one you handed a comp link to, revoke the link key now.'
@@ -1307,6 +1325,18 @@ export default async function handler(req) {
   }
 
   return received();
+}
+
+/**
+ * Whether a completed checkout is reported to Meta as a Purchase.
+ *
+ * Two exclusions, one reason: neither is an ad buyer, and the optimizer must not learn from
+ * them. A comp moves no money; a friends-lane sale is a person the founders know, in a country
+ * no ad targets. Pure and exported so scripts/friends-lane-check.mjs can prove the branch
+ * without a signed Stripe event.
+ */
+export function shouldSendMetaPurchase({ isComp, lane }) {
+  return !isComp && lane !== 'friends';
 }
 
 // Best-effort: create (or find) the Supabase auth user for this buyer and mark their profile paid.
