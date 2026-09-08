@@ -4,30 +4,36 @@
 // success page and no Meta Purchase (memory zerofog-friends-lane-lena). Two files rather than a
 // flag on one so the ad funnel's button never changes when this one does.
 (function() {
-  var btn = document.getElementById('buyBtn');
-  if (!btn) return;
+  // EVERY Enroll button opens checkout, not only the one in the price box (CEO 08.09: the other
+  // two scrolled to the price and looked broken). The page has three: two in the flow and one
+  // inside the box; they are bound as a set, and the click handler below is written for any of
+  // them - `btn` was a single element until 08.09.
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.cta-btn'));
+  if (!buttons.length) return;
 
-  // Inline error element, inserted right after the button. We do not alter the
-  // sales.njk markup, so the error node is created on demand here.
-  var errorEl = null;
-  function showError(msg) {
+  // The error is shown under the button that was actually clicked, so a failure on the last
+  // button does not put a message 3,000 pixels up the page where nobody sees it.
+  function showError(btn, msg) {
+    var errorEl = btn.parentNode.querySelector('.buyError');
     if (!errorEl) {
       errorEl = document.createElement('p');
-      errorEl.id = 'buyError';
+      errorEl.className = 'buyError';
       errorEl.style.cssText = 'color:#e5484d;font-size:0.85rem;text-align:center;margin-top:12px;';
       btn.parentNode.insertBefore(errorEl, btn.nextSibling);
     }
     errorEl.textContent = msg;
   }
-  function clearError() {
+  function clearError(btn) {
+    var errorEl = btn.parentNode.querySelector('.buyError');
     if (errorEl) errorEl.textContent = '';
   }
 
-  btn.addEventListener('click', function(e) {
+  function onClick(e) {
+    var btn = e.currentTarget;
     e.preventDefault();
 
     var originalText = btn.textContent;
-    clearError();
+    clearError(btn);
     btn.classList.add('is-loading');
     btn.setAttribute('aria-disabled', 'true');
     btn.style.pointerEvents = 'none';
@@ -56,7 +62,9 @@
       })
       .catch(function() {
         restore();
-        showError('Something went wrong, please try again.');
+        showError(btn, 'Something went wrong, please try again.');
       });
-  });
+  }
+
+  buttons.forEach(function (b) { b.addEventListener('click', onClick); });
 })();
