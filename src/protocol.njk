@@ -1,6 +1,6 @@
 ---
 title: "Why You Lose 2-3 Sharp Hours Every Day - The Zero Fog"
-permalink: /start/
+permalink: /protocol/
 ---
 {% extends "layouts/base.njk" %}
 
@@ -10,15 +10,15 @@ permalink: /start/
    The friends lane (memory zerofog-friends-lane-lena, plan T-080): a classic long text sales letter,
    the workshop's order compressed - story, "you already ruled it out", the mechanism, the course,
    the offer. Neutral about where the reader came from: the address itself is the lane's tracker,
-   so nothing on the page says friend, referral, promo or discount. Also the door for readers of
-   the SEO articles (T-005 merged here, 07.09.2026). noindex, linked from nowhere on the site, no
-   Meta pixel (ZF_NO_META_PIXEL - people the founders know must not teach the optimizer), PostHog
-   stays. Text blocks LOCKED on /sales/ are copied verbatim; APPROVED-COPY.md is the registry. #}
+   so nothing on the page says friend, referral, promo or discount. THIS address is the door for readers of the SEO
+   articles and of the E9 email (T-005). /start/ carries the identical letter for the friends lane;
+   the two differ only in the lane marker and the pixel. noindex, and the Meta pixel stays ON here -
+   an article reader is a real target-audience buyer, unlike somebody the founders know. Text blocks LOCKED on /sales/ are copied verbatim; APPROVED-COPY.md is the registry. #}
 
 {% block head_extras %}
 <meta name="description" content="Why no productivity tool, no habit, no &quot;just push through&quot; ever fixed it - and why none of it was your fault. The story and the four-week protocol.">
 <meta name="robots" content="noindex">
-<script>window.ZF_LANE = 'friends'; window.ZF_NO_META_PIXEL = true;</script>
+<script>window.ZF_LANE = 'articles';</script>
 {% endblock %}
 
 {% block page_css %}

@@ -1050,6 +1050,16 @@ export default async function handler(req) {
     const expired = event.data?.object || {};
     const abandonedEmail =
       expired.customer_details?.email || expired.customer_email || null;
+    // NOT for the friends lane (CEO 08.09.2026). E18 is a recovery nudge with a "Finish Your
+    // Checkout" button, and these are people a friend of the founders forwarded a message to -
+    // polishing them toward the purchase is exactly what this lane is built not to do. It would
+    // also send them to /enroll/, the main funnel's checkout, where the sale would be stamped
+    // sales_page and Lena would silently lose her half of it.
+    const expiredLane = expired.metadata?.source || '';
+    if (expiredLane === 'friends') {
+      console.log('E18 skipped: friends lane');
+      return received();
+    }
     if (abandonedEmail && expired.payment_status !== 'paid') {
       await sendAbandonedCheckout(abandonedEmail);
     }

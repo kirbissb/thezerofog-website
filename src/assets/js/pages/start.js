@@ -49,7 +49,10 @@
     fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ source: "friends" }),
+      // The lane comes from the page, not from this file: the same letter is served at /start/
+      // (friends, counted as Lena's) and /protocol/ (article readers, counted as ours). Hard-coding
+      // "friends" here is what would have paid her half on every article sale.
+      body: JSON.stringify({ source: window.ZF_LANE || 'friends' }),
     })
       .then(function(res) {
         if (!res.ok) throw new Error('error');

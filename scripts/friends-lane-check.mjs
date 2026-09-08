@@ -57,5 +57,20 @@ eq('Meta Purchase: friends sale -> NOT sent', shouldSendMetaPurchase({ isComp: f
 eq('Meta Purchase: comp, default lane -> NOT sent', shouldSendMetaPurchase({ isComp: true, lane: 'sales' }), false);
 eq('Meta Purchase: comp through friends -> NOT sent', shouldSendMetaPurchase({ isComp: true, lane: 'friends' }), false);
 
+// THE ARTICLES LANE (added 08.09.2026). The same letter at /protocol/, so that /start/ can keep
+// meaning "Lena's" - every sale at /start/ is counted into her half, and the SEO article doors
+// were scheduled to point there.
+eq('articles lane from /protocol/ lands on the recording and carries its own marker',
+  pick(buildSessionParams('price_x', base, true, null, 'articles')),
+  { success: `${base}/start/thanks/?session_id={CHECKOUT_SESSION_ID}`, cancel: `${base}/protocol/`, source: 'articles', comp: null });
+
+eq('the two lanes never share a marker', [
+  buildSessionParams('price_x', base, true, null, 'friends').get('metadata[source]'),
+  buildSessionParams('price_x', base, true, null, 'articles').get('metadata[source]'),
+], ['friends', 'articles']);
+
+eq('Meta Purchase: article-reader sale -> sent (a real target buyer, unlike a friend)',
+  shouldSendMetaPurchase({ isComp: false, lane: 'articles' }), true);
+
 console.log(fail ? `\n${fail} FAILED` : '\nall passed');
 process.exit(fail ? 1 : 0);

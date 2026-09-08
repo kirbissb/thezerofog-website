@@ -38,9 +38,17 @@ const TOS_CONSENT_MESSAGE =
 // the monthly share. Everything else - price, enrollment, E14, the boards - is identical.
 //
 // Allow-listed, never echoed: a stranger's POST with a made-up source gets the default lane.
+//
+// 'articles' is the same letter at a second address (/protocol/), opened for readers of the SEO
+// articles and the E9 "did not attend" email. It exists ONLY so the friends lane keeps its
+// meaning: /start/ is tracked by its address and every sale there is counted as Lena's half, so
+// any other traffic pointed at /start/ would have been paid out to her (CEO 08.09.2026). The
+// article reader is a real target-audience buyer, so unlike 'friends' this lane DOES teach Meta:
+// the page carries the pixel and shouldSendMetaPurchase already returns true for it.
 const LANES = {
   sales_page: { successPath: '/welcome/', cancelPath: '/sales/' },
   friends: { successPath: '/start/thanks/', cancelPath: '/start/' },
+  articles: { successPath: '/start/thanks/', cancelPath: '/protocol/' },
 };
 
 function laneFor(source) {

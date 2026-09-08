@@ -21,7 +21,10 @@
 import { createHash } from 'node:crypto';
 import { insert, json, preflight } from './lib/wr-db.js';
 
-const PARAM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'from', 'qa'];
+// 'q' is the QR marker: qr-start.png points at /start/?q=1, and without this key the whole query
+// string was dropped (the url column stores origin+pathname only), so a scan and a tap were
+// indistinguishable in every log we keep. One word, added 08.09.2026.
+const PARAM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'from', 'qa', 'q'];
 
 export default async function handler(req) {
   if (req.method === 'OPTIONS') return preflight();
