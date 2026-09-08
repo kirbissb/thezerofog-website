@@ -24,11 +24,48 @@ permalink: /start/
 {% block page_css %}
 <link rel="stylesheet" href="{{ '/assets/css/pages/sales-6.css' | v }}">
 <style>
-  .sales .body-text { color: var(--text); }
-  .sales .pull { font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: var(--text); border-left: 3px solid var(--accent); padding: 4px 0 4px 18px; margin: 24px 0; }
-  .sales .plain-list { margin: 0 0 16px 20px; color: var(--text); line-height: 1.7; font-size: 0.95rem; }
-  .sales .plain-list li { margin-bottom: 6px; }
+  /* READING SIZE. This page is a 5,500-word letter read in one sitting, not the post-workshop
+     recap /sales/ was written for, and sales-6.css sizes body copy at 0.95rem for that page.
+     Misha, reading it cold on 08.09.2026: "надо шрифт побольше сделать - когда долго читаешь
+     тупо начинает сливаться всё". So: bigger type, more line height, more air between
+     paragraphs, and a slightly narrower column so the measure stays near 70 characters at the
+     larger size. Scoped to this page; /sales/ is untouched. */
+  .sales { max-width: 640px; }
+  .sales .lead { font-size: 1.2rem; line-height: 1.75; color: var(--text); margin-bottom: 24px; }
+  .sales .body-text { font-size: 1.075rem; line-height: 1.8; color: var(--text); margin-bottom: 22px; }
+  .sales h2 { margin-top: 8px; }
+  .sales .pull { font-size: 1.25rem; font-weight: 700; line-height: 1.55; color: var(--text); border-left: 3px solid var(--accent); padding: 6px 0 6px 20px; margin: 30px 0; }
+  .sales .plain-list { margin: 0 0 22px 20px; color: var(--text); line-height: 1.8; font-size: 1.075rem; }
+  .sales .plain-list li { margin-bottom: 10px; }
+  .sales .week-card p { font-size: 1rem; line-height: 1.72; }
+  .sales .includes li, .sales .toolkit-list li { font-size: 1rem; line-height: 1.7; }
+  .sales .faq-item > summary { font-size: 1.03rem; }
+  .sales .faq-item p { font-size: 1.02rem; line-height: 1.75; }
+  .sales .guarantee p { font-size: 1rem; line-height: 1.7; }
+  .sales .alt-table { font-size: 0.98rem; }
   .sales .body-text a, .sales .faq-item a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+  /* THE BAR. A busy reader does not scroll 5,500 words to find out there is a button (CEO
+     08.09.2026). One appears after the first screen and rides the bottom of the window; it hides
+     itself whenever a real Enroll button is on screen, so nobody is ever shown two. It sits above
+     the cookie banner by the same --zf-cb-h the banner publishes (cookie-consent-5.js). */
+  .zf-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg2, var(--bg)); border-top: 1px solid var(--border-accent);
+    transform: translateY(110%); transition: transform .22s ease; will-change: transform;
+  }
+  body.zf-cb-open .zf-bar { bottom: var(--zf-cb-h, 0px); }
+  .zf-bar.is-shown { transform: translateY(0); }
+  .zf-bar-price { font-size: 0.95rem; color: var(--text); font-weight: 700; white-space: nowrap; }
+  .zf-bar-price span { color: var(--text2); font-weight: 500; }
+  .zf-bar .cta-btn { padding: 11px 26px; font-size: 0.9rem; }
+  @media (max-width: 480px) {
+    .zf-bar { gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); }
+    .zf-bar-price span { display: none; }
+    .zf-bar .cta-btn { padding: 11px 18px; }
+  }
 </style>
 {% endblock %}
 
@@ -343,6 +380,11 @@ permalink: /start/
 
   <p class="disclaimer">This is an educational program, not medical treatment. Results vary.</p>
 
+</div>
+
+<div class="zf-bar" id="zfBar">
+  <p class="zf-bar-price">$67 <span>one-time, 30-day refund</span></p>
+  <a href="#" class="cta-btn" id="zfBarBtn">Enroll Now</a>
 </div>
 
 {% endblock %}

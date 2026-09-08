@@ -67,4 +67,35 @@
   }
 
   buttons.forEach(function (b) { b.addEventListener('click', onClick); });
+
+  // THE STICKY BAR.
+  //
+  // A 5,500-word letter puts the first buy button thousands of pixels down, and a busy reader can
+  // leave without ever learning there is one (CEO 08.09.2026). The bar carries the price and a
+  // button - it is bound above like any other .cta-btn, so it opens the same checkout.
+  //
+  // It appears only after the reader is past the first screen, and it hides itself whenever a real
+  // Enroll button is on screen, so the page never shows two at once. IntersectionObserver rather
+  // than a scroll handler: the browser does the work off the main thread, and a long page scrolled
+  // with a trackpad is exactly where a scroll listener costs something visible.
+  var bar = document.getElementById('zfBar');
+  if (!bar || !('IntersectionObserver' in window)) return;
+
+  var inFlow = buttons.filter(function (b) { return !bar.contains(b); });
+  var visible = 0;
+
+  function update() {
+    var pastFirstScreen = window.scrollY > window.innerHeight * 0.8;
+    bar.classList.toggle('is-shown', pastFirstScreen && visible === 0);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { visible += e.isIntersecting ? 1 : -1; });
+    if (visible < 0) visible = 0;
+    update();
+  }, { rootMargin: '-10% 0px -10% 0px' });
+  inFlow.forEach(function (b) { io.observe(b); });
+
+  addEventListener('scroll', update, { passive: true });
+  update();
 })();
