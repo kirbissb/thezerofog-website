@@ -81,9 +81,9 @@ export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon,
   // what keeps stripe-webhook.js's amount guard true: an exclusive price would charge 81.07 in
   // Spain, the guard would refuse the paid order, and the buyer would have no course.
   //
-  // Sent on every session, and dropped by the retry in createSession if the account is not set up
-  // for it yet (no origin address, no registration). Same shape as the ToS retry above: the
-  // feature turns itself on the moment the dashboard is configured, with no deploy.
+  // Sent only when the price is inclusive (taxIsSafeForPrice), and dropped by the retry in
+  // createSession if the account is not set up for it yet. Same shape as the ToS retry above: the
+  // feature turns itself on the moment the dashboards are finished, with no deploy.
   if (withTax) {
     params.set('automatic_tax[enabled]', 'true');
   }
@@ -100,6 +100,50 @@ export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon,
     if (laneFor(source) === 'sales_page') params.set('metadata[source]', 'comp_link');
   }
   return params;
+}
+
+/**
+ * Is the configured price safe to charge tax on top of?
+ *
+ * Only a price with tax_behavior=inclusive is: the buyer pays the $67 the page shows and the VAT
+ * is carved out of it. With `exclusive` Stripe would ADD the VAT, so a Spanish consumer would see
+ * 67 and be charged 81.07 - which EU price-display rules do not allow and which no line of copy on
+ * the site prepares them for.
+ *
+ * So the tax flag is not a constant and not a deploy: it is read from the price itself. Today the
+ * live price is exclusive and this returns false, so nothing changes. The moment STRIPE_PRICE_ID
+ * points at the inclusive price, tax starts being collected with no code change - and if that env
+ * var is ever pointed back at an exclusive price, tax stops again by itself.
+ *
+ * Cached per warm instance, and false on any failure: never let a lookup decide a sale.
+ */
+let priceIsInclusive = null;
+let priceCheckedFor = null;
+
+async function taxIsSafeForPrice(secretKey, priceId) {
+  if (priceCheckedFor === priceId && priceIsInclusive !== null) return priceIsInclusive;
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
+      headers: { Authorization: 'Bearer ' + secretKey },
+    });
+    if (!res.ok) {
+      console.error('price lookup for tax behaviour returned', res.status, '- charging without tax');
+      return false;
+    }
+    const price = await res.json();
+    priceIsInclusive = price.tax_behavior === 'inclusive';
+    priceCheckedFor = priceId;
+    if (!priceIsInclusive) {
+      console.warn(
+        'Stripe Tax is NOT applied: price', priceId, 'has tax_behavior', price.tax_behavior,
+        '- EU VAT is not being collected. Point STRIPE_PRICE_ID at a tax_behavior=inclusive price.'
+      );
+    }
+    return priceIsInclusive;
+  } catch (err) {
+    console.error('price lookup failed, charging without tax:', err.message);
+    return false;
+  }
 }
 
 export default async function handler(req) {
@@ -224,7 +268,7 @@ async function createSession(secretKey, priceId, baseUrl, compCoupon, source) {
     // error that names it and the call is retried. Both start ON, so the day the dashboard is
     // finished they simply begin working.
     let withTos = true;
-    let withTax = true;
+    let withTax = await taxIsSafeForPrice(secretKey, priceId);
     let stripeRes;
     let session;
 
