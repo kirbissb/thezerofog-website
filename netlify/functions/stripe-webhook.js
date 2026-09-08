@@ -1164,10 +1164,21 @@ export default async function handler(req) {
       console.error('Payment validation failed: payment_status is', session.payment_status);
       return received();
     }
-    if (String(session.amount_total) !== expectedAmount) {
+    // The guard compares what we were paid for the PRODUCT, not the total on the card.
+    //
+    // The price carries tax_behavior=inclusive, so a VAT-paying buyer still has amount_total 6700
+    // and the first comparison holds. The second exists because the price was `exclusive` until
+    // 2026-09-08: under that setting Stripe Tax would have charged a Spanish buyer 8107, this
+    // guard would have refused the event, and a person who had paid would have had no course and
+    // no error. A future price set back to exclusive can no longer do that silently.
+    const taxCents = Number(session.total_details?.amount_tax || 0);
+    const netOfTax = Number(session.amount_total) - taxCents;
+    if (String(session.amount_total) !== expectedAmount && String(netOfTax) !== expectedAmount) {
       console.error(
         'Payment validation failed: amount_total',
         session.amount_total,
+        'tax',
+        taxCents,
         'expected',
         expectedAmount
       );

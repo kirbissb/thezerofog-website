@@ -47,7 +47,7 @@ function laneFor(source) {
   return Object.prototype.hasOwnProperty.call(LANES, source) ? source : 'sales_page';
 }
 
-export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon, source) {
+export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon, source, withTax) {
   const lane = LANES[laneFor(source)];
   // Stripe expects bracket notation for nested and array params. URLSearchParams
   // encodes the literal {CHECKOUT_SESSION_ID} template braces as %7B...%7D,
@@ -74,6 +74,18 @@ export function buildSessionParams(priceId, baseUrl, withTosConsent, compCoupon,
   if (withTosConsent) {
     params.set('consent_collection[terms_of_service]', 'required');
     params.set('custom_text[terms_of_service_acceptance][message]', TOS_CONSENT_MESSAGE);
+  }
+  // VAT. Stripe Tax works out the buyer's country and rate; the price carries
+  // tax_behavior=inclusive, so an EU consumer is charged the $67 they were shown and the VAT is
+  // carved out of it. That is what EU consumer law requires of a displayed price, and it is also
+  // what keeps stripe-webhook.js's amount guard true: an exclusive price would charge 81.07 in
+  // Spain, the guard would refuse the paid order, and the buyer would have no course.
+  //
+  // Sent on every session, and dropped by the retry in createSession if the account is not set up
+  // for it yet (no origin address, no registration). Same shape as the ToS retry above: the
+  // feature turns itself on the moment the dashboard is configured, with no deploy.
+  if (withTax) {
+    params.set('automatic_tax[enabled]', 'true');
   }
   // A comped seat - see the GET branch in the handler. The coupon takes the price to zero,
   // and the metadata marker is what stripe-webhook.js checks before it lets a zero-amount
@@ -206,32 +218,41 @@ async function createSession(secretKey, priceId, baseUrl, compCoupon, source) {
   // and is not moved for the sake of a tester.
   const versionHeader = compCoupon ? { 'Stripe-Version': '2023-08-16' } : {};
   try {
-    let stripeRes = await fetch(STRIPE_CHECKOUT_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + secretKey,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...versionHeader,
-      },
-      body: buildSessionParams(priceId, baseUrl, true, compCoupon, source).toString(),
-    });
+    // Two optional pieces can each be refused by an account that is not configured for them: the
+    // EU withdrawal-right waiver (needs a Terms of Service URL) and Stripe Tax (needs an origin
+    // address and a registration). Neither is worth losing a sale over, so each is dropped on the
+    // error that names it and the call is retried. Both start ON, so the day the dashboard is
+    // finished they simply begin working.
+    let withTos = true;
+    let withTax = true;
+    let stripeRes;
+    let session;
 
-    let session = await stripeRes.json();
-
-    // consent_collection fails until the ToS URL is configured in the Stripe
-    // Dashboard. Keep checkout alive: retry once without the consent block and
-    // log loudly so the missing dashboard setting gets fixed.
-    if ((!stripeRes.ok || session.error) && /terms of service/i.test(session.error?.message || '')) {
-      console.error('EU ToS consent rejected by Stripe (is the Terms of Service URL set in Dashboard -> Settings -> Business?). Retrying WITHOUT the withdrawal-right waiver:', session.error?.message);
+    for (let attempt = 0; attempt < 3; attempt++) {
       stripeRes = await fetch(STRIPE_CHECKOUT_ENDPOINT, {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + secretKey,
           'Content-Type': 'application/x-www-form-urlencoded',
+          ...versionHeader,
         },
-        body: buildSessionParams(priceId, baseUrl, false, compCoupon, source).toString(),
+        body: buildSessionParams(priceId, baseUrl, withTos, compCoupon, source, withTax).toString(),
       });
       session = await stripeRes.json();
+      if (stripeRes.ok && !session.error) break;
+
+      const msg = session.error?.message || '';
+      if (withTos && /terms of service/i.test(msg)) {
+        console.error('EU ToS consent rejected by Stripe (is the Terms of Service URL set in Dashboard -> Settings -> Business?). Retrying WITHOUT the withdrawal-right waiver:', msg);
+        withTos = false;
+        continue;
+      }
+      if (withTax && /tax|address/i.test(msg)) {
+        console.error('Stripe Tax rejected (is the origin address set and a registration added in Dashboard -> Tax?). Retrying WITHOUT automatic tax - EU VAT is NOT being collected on this sale:', msg);
+        withTax = false;
+        continue;
+      }
+      break;
     }
 
     if (!stripeRes.ok || session.error) {

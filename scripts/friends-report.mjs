@@ -94,7 +94,14 @@ for (const s of sessions) {
   if (!ch || !bt) { console.error('no charge/balance transaction on', s.id); continue; }
 
   const refundedShare = ch.amount ? (ch.amount_refunded || 0) / ch.amount : 0;
-  const netSettled = bt.net; // after every fee_details row (processing + conversion)
+
+  // VAT is not ours and must never enter her half. Stripe reports it on the session
+  // (total_details.amount_tax, in the CHARGE currency), while the balance transaction reports the
+  // settled amount and fees in the account currency, so the tax is removed in proportion rather
+  // than subtracted across currencies.
+  const taxCents = Number(s.total_details?.amount_tax || 0);
+  const taxShare = s.amount_total ? taxCents / Number(s.amount_total) : 0;
+  const netSettled = Math.round(bt.net * (1 - taxShare)); // after fees, and after VAT
   const netAfterRefund = Math.round(netSettled * (1 - refundedShare));
   const dueAt = s.created + WINDOW_DAYS * 86400;
   const now = Math.floor(Date.now() / 1000);
@@ -109,6 +116,7 @@ for (const s of sessions) {
     charged: money(s.amount_total, s.currency),
     settled: money(bt.amount, bt.currency),
     fee: money(bt.fee, bt.currency) + ' (' + (bt.fee_details || []).map((f) => `${f.type} ${(f.amount / 100).toFixed(2)}`).join(' + ') + ')',
+    tax: taxCents ? money(taxCents, s.currency) : '-',
     net: money(netAfterRefund, bt.currency),
     state, dueAt, due: now >= dueAt && !ch.refunded,
     share, shareCur: bt.currency,
@@ -117,14 +125,14 @@ for (const s of sessions) {
 
 const selected = rows.filter((r) => ALL || (MONTH ? day(r.dueAt).startsWith(MONTH) && !r.state.startsWith('REFUNDED') : r.due));
 console.log(`# Friends lane - ${ALL ? 'all sales' : MONTH ? 'share due in ' + MONTH : 'share due now'} (generated ${new Date().toISOString().slice(0, 16)}Z)\n`);
-console.log(`Sales with metadata.source=friends since ${day(LANE_OPENED)}: ${rows.length}. Rule: ${SHARE * 100} percent of the net settled amount (after Stripe processing and conversion fees), ${WINDOW_DAYS} days after purchase, full refunds excluded, partial refunds pro rata.\n`);
+console.log(`Sales with metadata.source=friends since ${day(LANE_OPENED)}: ${rows.length}. Rule: ${SHARE * 100} percent of the net settled amount (after Stripe processing and conversion fees, and after VAT, which is not ours), ${WINDOW_DAYS} days after purchase, full refunds excluded, partial refunds pro rata.\n`);
 if (!selected.length) {
   console.log('Nothing to pay in this selection.');
 } else {
-  console.log('| Bought | Buyer | Charged | Settled | Stripe fees | Net | State | Share |');
-  console.log('|---|---|---|---|---|---|---|---|');
+  console.log('| Bought | Buyer | Charged | VAT | Settled | Stripe fees | Net | State | Share |');
+  console.log('|---|---|---|---|---|---|---|---|---|');
   for (const r of selected) {
-    console.log(`| ${r.date} | ${r.email} | ${r.charged} | ${r.settled} | ${r.fee} | ${r.net} | ${r.state} | ${money(r.share, r.shareCur)} |`);
+    console.log(`| ${r.date} | ${r.email} | ${r.charged} | ${r.tax} | ${r.settled} | ${r.fee} | ${r.net} | ${r.state} | ${money(r.share, r.shareCur)} |`);
   }
   const total = selected.reduce((a, r) => a + r.share, 0);
   const cur = selected[0].shareCur;
