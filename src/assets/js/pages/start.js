@@ -82,16 +82,25 @@
   if (!bar || !('IntersectionObserver' in window)) return;
 
   var inFlow = buttons.filter(function (b) { return !bar.contains(b); });
-  var visible = 0;
+
+  // A SET of what is currently on screen, not a counter. A counter was the first version and it
+  // drifted: enter and leave events do not always arrive in pairs when the page jumps (an anchor,
+  // a programmatic scroll, a restored position), and one missed leave hides the bar for the rest
+  // of the session with nothing to show for it. Membership is recomputed from each entry, so any
+  // callback ordering lands on the same answer.
+  var onScreen = [];
 
   function update() {
     var pastFirstScreen = window.scrollY > window.innerHeight * 0.8;
-    bar.classList.toggle('is-shown', pastFirstScreen && visible === 0);
+    bar.classList.toggle('is-shown', pastFirstScreen && onScreen.length === 0);
   }
 
   var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { visible += e.isIntersecting ? 1 : -1; });
-    if (visible < 0) visible = 0;
+    entries.forEach(function (e) {
+      var i = onScreen.indexOf(e.target);
+      if (e.isIntersecting && i === -1) onScreen.push(e.target);
+      if (!e.isIntersecting && i !== -1) onScreen.splice(i, 1);
+    });
     update();
   }, { rootMargin: '-10% 0px -10% 0px' });
   inFlow.forEach(function (b) { io.observe(b); });
