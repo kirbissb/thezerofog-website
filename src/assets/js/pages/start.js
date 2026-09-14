@@ -8,7 +8,20 @@
   // two scrolled to the price and looked broken). The page has three: two in the flow and one
   // inside the box; they are bound as a set, and the click handler below is written for any of
   // them - `btn` was a single element until 08.09.
-  var buttons = Array.prototype.slice.call(document.querySelectorAll('.cta-btn'));
+  // Only the REAL buy buttons open a checkout, and they are the ones the generator emits with
+  // href="#": the one inside the price card and the one in the sticky bar. Everything else that
+  // wears .cta-btn is navigation - the mid-page "Enroll Now" buttons that point at #enroll, and
+  // the button that opens the free dashboard.
+  //
+  // Until 2026-09-14 the handler was bound to every .cta-btn and called preventDefault, so href
+  // was dead markup on all of them: a reader who pressed "Enroll Now" three thousand pixels above
+  // the price went straight to Stripe without ever seeing what was included or what it cost.
+  var all = Array.prototype.slice.call(document.querySelectorAll('.cta-btn'));
+  var buttons = all.filter(function (b) { return b.getAttribute('href') === '#'; });
+  var enrollish = all.filter(function (b) {
+    var h = b.getAttribute('href');
+    return h === '#' || h === '#enroll';
+  });
   if (!buttons.length) return;
 
   // The error is shown under the button that was actually clicked, so a failure on the last
@@ -84,7 +97,10 @@
   var bar = document.getElementById('zfBar');
   if (!bar || !('IntersectionObserver' in window)) return;
 
-  var inFlow = buttons.filter(function (b) { return !bar.contains(b); });
+  // The bar steps aside for any enroll-shaped button, not only the ones that buy - two
+  // "Enroll Now" on one screen is the thing it exists to avoid. The dashboard button is not
+  // one of them and must not hide the bar.
+  var inFlow = enrollish.filter(function (b) { return !bar.contains(b); });
 
   // A SET of what is currently on screen, not a counter. A counter was the first version and it
   // drifted: enter and leave events do not always arrive in pairs when the page jumps (an anchor,

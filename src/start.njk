@@ -45,6 +45,17 @@ permalink: /start/
   .sales .alt-table { font-size: 0.98rem; }
   .sales .body-text a, .sales .faq-item a { color: var(--accent); font-weight: 600; text-decoration: none; }
 
+  /* What the buyer gets, inside the price card - so one tap on Enroll shows the contents, the
+     price and the button together, without scrolling. The full week-by-week stays where it was,
+     up in "Let me show you what's inside": repeating it here would push the button off a phone
+     screen, which is the thing this anchor exists to prevent. */
+  .sales .price-includes { list-style: none; padding: 0; margin: 0 0 18px; text-align: left; }
+  .sales .price-includes li { position: relative; padding-left: 22px; margin-bottom: 7px;
+    font-size: 0.95rem; line-height: 1.5; color: var(--text2); }
+  .sales .price-includes li::before { content: "¹3"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .sales .price-includes b { color: var(--text); }
+  .sales .price-box { scroll-margin-top: 16px; }
+
   /* THE BAR. A busy reader does not scroll 5,500 words to find out there is a button (CEO
      08.09.2026). One appears after the first screen and rides the bottom of the window; it hides
      itself whenever a real Enroll button is on screen, so nobody is ever shown two. It sits above
@@ -273,7 +284,7 @@ permalink: /start/
     <p class="body-text">Works on desktop and on your phone - add it to your home screen straight from the browser, no app store needed. Your data saves as you go. And everything prints, if paper protocols are your thing.</p>
   </div>
 
-  <div class="section" id="enroll">
+  <div class="section">
     <p class="label">The Math</p>
     <h2>So what does this cost?</h2>
     <p class="body-text">Before I show you the number, let me put it in context. These are your real alternatives:</p>
@@ -291,8 +302,17 @@ permalink: /start/
     </div>
     <p class="body-text">The protocol takes the same clinical toolkit and turns it into four weeks you run yourself - with the Toolkit doing the tracking.</p>
     <p class="body-text">And remember - you're already paying for this problem. The productivity apps. The courses. The supplements, the greens subscription, the extra coffees just to function. For a lot of people that adds up to somewhere between three hundred and two thousand dollars a year - all of it spent upgrading the stereo in a car with a broken engine. What if you just fixed the engine?</p>
-    <div class="price-box">
+    <div class="price-box" id="enroll">
       <p class="price-founding">Founding Member Price</p>
+      <ul class="price-includes">
+        <li><b>The full 4-week protocol</b> - video lessons, 10-15 min each, all four weeks open from day one</li>
+        <li><b>Week 1 Clock, Week 2 Battery, Week 3 Off-Switch, Week 4 Sync</b> - each week builds on the last</li>
+        <li><b>An action card per lesson</b> - one thing to do, never twenty</li>
+        <li><b>The Toolkit app</b> - Diary, Assessment, Protocol Card, on desktop and phone</li>
+        <li><b>All three free tools built in</b> - the calculators live in the same dashboard</li>
+        <li><b>A direct line to me</b> - reply to any email and it reaches me, not a support desk</li>
+        <li><b>30 days to change your mind</b> - no questions, nothing to send</li>
+      </ul>
       <p class="price-amount">$67</p>
       <p class="price-original">Regular price: $167</p>
       <p class="price-note">One-time payment. Lifetime access.</p>
@@ -301,11 +321,16 @@ permalink: /start/
     </div>
     <p class="body-text">You are buying before the proof exists, and your result is what makes it exist. That is what founding means here.</p>
     <p class="body-text">Founding members get first access to every new tool and update. Including an AI assistant that knows your protocol - coming soon, free for founders.</p>
+    <div class="guarantee">
+      <h3>30-Day Sharper-or-Refund Guarantee</h3>
+      <p>Any day in those thirty: if your days haven't gotten sharper, just tell me and I'll refund every cent. No questions, nothing to send, nothing to prove - not even the diary. After day 30 the window closes. No drama. I only ask one thing: actually do the work. Full details: <a href="/refunds/">refund policy</a>.</p>
+      <p class="guarantee-sign">- Kirill, The Zero Fog</p>
+    </div>
   </div>
 
   <div class="section">
-    <h2>You Already Have These Three</h2>
-    <p class="body-text">Free - each one a working tool, not a PDF with tips. They live in the same <a href="https://thezerofog.com/app/">dashboard</a> the course unlocks the rest of: the Diary, the Assessment, the Protocol Card.</p>
+    <h2>Three Tools, Free, No Purchase</h2>
+    <p class="body-text">These three are free to anyone - open right now, no sign-up, no card. Each one is a working tool, not a PDF with tips. They live in the same dashboard the course unlocks the rest of: the Diary, the Assessment, the Protocol Card.</p>
     <div class="bonus-card">
       <div class="bonus-cover"><div class="bc-chiprow"><span class="bc-chip">Drip coffee &middot; 95 mg</span><span class="bc-chip">Bed 11:00 PM</span></div><div class="bc-readout"><span class="bc-readout-label">Your window</span><span class="bc-readout-val">3:00 &ndash; 7:30 PM</span></div></div>
       <div class="bonus-body">
@@ -327,11 +352,7 @@ permalink: /start/
         <p>Ten things you do for energy that quietly work against you. Each one debunked with a linked study - PubMed sources, not "trust me".</p>
       </div>
     </div>
-    <div class="guarantee">
-      <h3>30-Day Sharper-or-Refund Guarantee</h3>
-      <p>Any day in those thirty: if your days haven't gotten sharper, just tell me and I'll refund every cent. No questions, nothing to send, nothing to prove - not even the diary. After day 30 the window closes. No drama. I only ask one thing: actually do the work. Full details: <a href="/refunds/">refund policy</a>.</p>
-      <p class="guarantee-sign">- Kirill, The Zero Fog</p>
-    </div>
+    <p style="text-align:center;margin:8px 0 8px;"><a href="https://thezerofog.com/app/" class="cta-btn">Open the dashboard - free, no sign-up</a></p>
   </div>
 
   <div class="section">
