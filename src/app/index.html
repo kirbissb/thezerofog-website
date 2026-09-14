@@ -170,6 +170,12 @@
   .wv-back:hover { opacity:.92; }
   .wv-back[hidden] { display:none; }
   @media (max-width:900px){ .wv-back { right:14px; bottom:14px; padding:10px 14px; font-size:13px; } }
+  /* Crisp's own launcher takes the same corner once it loads, and unlike our stand-in button it
+     obeys no rule of ours - it sat on top of this button and covered the end of its label.
+     `zf-crisp-on` is set the moment the real widget is requested, so the button steps up over
+     the launcher (about 54px plus its margin) instead of hiding behind it. */
+  body.zf-crisp-on .wv-back { bottom:92px; }
+  @media (max-width:900px){ body.zf-crisp-on .wv-back { bottom:80px; } }
   @media print { .wv-back { display:none !important; } }
   @media print { #view-bonuses .waves-count { display:none !important; } }
 
@@ -3931,6 +3937,9 @@ boot();
   function init() {
     if (window.zfCrispLoaded) return;
     window.zfCrispLoaded = true;
+    /* The back button lives in the same corner - tell the page, so it can step over the launcher. */
+    if (document.body) document.body.classList.add('zf-crisp-on');
+    else document.addEventListener('DOMContentLoaded', function () { document.body.classList.add('zf-crisp-on'); });
     window.$crisp = window.$crisp || [];
     window.CRISP_WEBSITE_ID = 'bef46e79-4888-4c70-93ae-f6a18470fc61';
     var s = document.createElement('script');
