@@ -1,0 +1,94 @@
+---
+title: "The Zero Fog - full session"
+permalink: /session/
+---
+{% extends "layouts/base.njk" %}
+
+{# A plain, always-open copy of the FULL workshop master (3488 s), for people who need to review
+   the funnel rather than be sold by it: partners, the friends lane, anyone we hand the link to.
+
+   Why it exists as its own address. The room (`wr-room.js`) is one person, one session, one
+   server-computed deadline - correct for a registrant, useless for somebody who has to be able to
+   open it on a Tuesday and scrub. `/start/thanks/` and `/welcome/` carry the BUYER CUT, which
+   stops at 3058.7 s, before the offer - also wrong here, because reviewing the funnel means
+   seeing the offer.
+
+   So this page is the master, uncut, no token, no countdown, with our own speed control. It is
+   noindex and unlinked: the address is the access. That is the same exposure the file already
+   carries - the CloudFront URL sits in the public repo either way. #}
+
+{% block head_extras %}
+<meta name="robots" content="noindex">
+<meta name="description" content="The full recorded session.">
+<script>window.ZF_NO_META_PIXEL = true;</script>
+{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ '/assets/css/pages/welcome-2.css' | v }}">
+<style>
+  .session-wrap { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px; }
+  .session-video { width: 100%; margin-bottom: 16px; }
+  .session-video video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid var(--border-accent); background: #0d0d0d; }
+  .session-heading { font-size: 0.7rem; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 700; text-align: center; }
+  .session-note { font-size: 0.85rem; color: var(--muted); line-height: 1.6; max-width: 620px; margin: 0 auto; text-align: center; }
+  .speed-row { display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .speed-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; }
+  .speed-btn { font: inherit; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+               border: 1px solid var(--border-accent); background: transparent; color: var(--muted); }
+  .speed-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<a href="/" class="brand">The Zero Fog</a>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">Light</button>
+
+<section class="session-wrap">
+  <p class="session-heading">The full session</p>
+
+  <div class="session-video">
+    <video id="sessionVid" controls playsinline preload="metadata"
+           poster="/assets/img/replay-poster.jpg">
+      <source src="https://d1yei2z3i6k35z.cloudfront.net/17244934/6a832c1d0fc977.60695874_FullWebV2-refund-fixed.mp4" type="video/mp4">
+      <track kind="captions" src="/assets/captions/workshop-v2.vtt" srclang="en" label="English">
+    </video>
+  </div>
+
+  <div class="speed-row" role="group" aria-label="Playback speed">
+    <span class="speed-label">Speed</span>
+    <button type="button" class="speed-btn" data-rate="1" aria-pressed="true">1x</button>
+    <button type="button" class="speed-btn" data-rate="1.25" aria-pressed="false">1.25x</button>
+    <button type="button" class="speed-btn" data-rate="1.5" aria-pressed="false">1.5x</button>
+    <button type="button" class="speed-btn" data-rate="1.75" aria-pressed="false">1.75x</button>
+    <button type="button" class="speed-btn" data-rate="2" aria-pressed="false">2x</button>
+  </div>
+
+  <p class="session-note">The whole thing, uncut, including the offer at the end - this is what a
+  registrant sees. No countdown: open it whenever, scrub, speed it up, come back to it. Captions
+  are in the player.</p>
+</section>
+
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+(function () {
+  var v = document.getElementById('sessionVid');
+  if (!v) return;
+  var rate = 1;
+  var btns = document.querySelectorAll('.speed-btn');
+  function apply(r) {
+    rate = r;
+    try { v.playbackRate = r; } catch (e) {}
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-pressed', String(parseFloat(btns[i].dataset.rate) === r));
+    }
+  }
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function () { apply(parseFloat(this.dataset.rate)); });
+  }
+  v.addEventListener('loadedmetadata', function () { if (rate !== 1) { try { v.playbackRate = rate; } catch (e) {} } });
+})();
+</script>
+{% endblock %}
