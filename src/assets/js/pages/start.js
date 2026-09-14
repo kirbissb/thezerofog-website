@@ -82,7 +82,34 @@
       });
   }
 
+  // THE BAR'S BUTTON IS TWO BUTTONS, decided by where the reader is (CEO 14.09.2026).
+  //
+  // Registered BEFORE the checkout handler on purpose: listeners on the element itself run in
+  // the order they were added - the capture flag buys nothing at the target - so binding this
+  // after onClick would let the checkout fire anyway.
+  //
+  // The bar arrives one screen into a 5,500-word letter, and under 480px its price line loses its
+  // tail to a media query - so it can be the only thing a reader has seen, showing "$67" and
+  // nothing else. Sending that person to Stripe is the same fault as a mid-page Enroll going
+  // straight to payment. Above the offer the bar scrolls to it; once the reader has passed the
+  // card, they have seen the contents and the price, and the bar pays.
+  var priceCard = document.getElementById('enroll');
+  var barBtn = document.getElementById('zfBarBtn');
+  if (priceCard && barBtn) {
+    barBtn.addEventListener('click', function (e) {
+      // Top of the card still below the fold = not read yet. Measured at click time rather than
+      // tracked: one number, no state to drift.
+      if (priceCard.getBoundingClientRect().top > 0) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        priceCard.scrollIntoView();
+        try { history.replaceState(null, '', '#enroll'); } catch (err) {}
+      }
+    }, true);
+  }
+
   buttons.forEach(function (b) { b.addEventListener('click', onClick); });
+
 
   // THE STICKY BAR.
   //
