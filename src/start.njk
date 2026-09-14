@@ -55,6 +55,9 @@ permalink: /start/
   .sales .price-includes li::before { content: "\2713"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
   .sales .price-includes b { color: var(--text); }
   .sales .price-box { scroll-margin-top: 16px; }
+  /* Without a cover the card is one column, so the roomy padding that framed the mock-up just
+     makes three short lines look like a wall. */
+  .sales .bonus-card--plain { padding: 15px 20px; margin-bottom: 10px; }
 
   /* THE BAR. A busy reader does not scroll 5,500 words to find out there is a button (CEO
      08.09.2026). One appears after the first screen and rides the bottom of the window; it hides
@@ -331,25 +334,22 @@ permalink: /start/
   <div class="section">
     <h2>Three Tools, Free, No Purchase</h2>
     <p class="body-text">These three are free to anyone - open right now, no sign-up, no card. Each one is a working tool, not a PDF with tips. They live in the same dashboard the course unlocks the rest of: the Diary, the Assessment, the Protocol Card.</p>
-    <div class="bonus-card">
-      <div class="bonus-cover"><div class="bc-chiprow"><span class="bc-chip">Drip coffee &middot; 95 mg</span><span class="bc-chip">Bed 11:00 PM</span></div><div class="bc-readout"><span class="bc-readout-label">Your window</span><span class="bc-readout-val">3:00 &ndash; 7:30 PM</span></div></div>
+    <div class="bonus-card bonus-card--plain">
       <div class="bonus-body">
         <h4>Your Caffeine Blueprint</h4>
-        <p>A personal cutoff calculator. Pick what you actually drink - espresso, drip, energy drink, pre-workout, or type the mg - enter your target bedtime, and it gives you the window to stop in for that exact dose. Big doses need far earlier cutoffs; the calculator does that math for you.</p>
+        <p>A cutoff calculator for what you actually drink. Your dose, your bedtime, the hour to stop by.</p>
       </div>
     </div>
-    <div class="bonus-card">
-      <div class="bonus-cover"><div class="bc-task"><span class="bc-box"></span><span>Wash pillows</span><span class="bc-due">due tomorrow</span></div><div class="bc-task"><span class="bc-box bc-box--on"></span><span>Flip mattress</span><span class="bc-due">done</span></div><div class="bc-calbtn">&#128197; Add reminders to calendar</div></div>
+    <div class="bonus-card bonus-card--plain">
       <div class="bonus-body">
         <h4>The Recovery Protocol</h4>
-        <p>Exact specs for the five things that decide how much repair your brain gets at night - down to mattress firmness by your weight and pillow height by how you sleep. The built-in maintenance tracker fills in every due date and sends reminders straight to your calendar.</p>
+        <p>Exact specs for the five things that decide how much your brain repairs at night, and a tracker that puts every due date in your calendar.</p>
       </div>
     </div>
-    <div class="bonus-card">
-      <div class="bonus-cover"><div class="bc-myth">"I've adapted to 6 hours of sleep"</div><div class="bc-src">Van Dongen et al., 2003 &middot; PubMed &rarr;</div></div>
+    <div class="bonus-card bonus-card--plain">
       <div class="bonus-body">
         <h4>10 Recovery Mistakes</h4>
-        <p>Ten things you do for energy that quietly work against you. Each one debunked with a linked study - PubMed sources, not "trust me".</p>
+        <p>Ten things you do for energy that quietly work against you, each one with the study behind it.</p>
       </div>
     </div>
     <p style="text-align:center;margin:8px 0 8px;"><a href="https://thezerofog.com/app/" class="cta-btn">Open the dashboard - free, no sign-up</a></p>
