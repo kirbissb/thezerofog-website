@@ -32,6 +32,14 @@ permalink: /start/thanks/
   .session-video video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 1px solid var(--border-accent); background: #0d0d0d; }
   .session-note { font-size: 0.85rem; color: var(--muted); line-height: 1.6; max-width: 560px; text-align: center; margin-bottom: 48px; }
   .session-heading { font-size: 0.7rem; color: var(--accent); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 700; text-align: center; }
+  /* Speed control is ours on purpose: the browser's native controls expose playback rate
+     inconsistently - Chrome buries it in a kebab menu, Safari and iOS do not show it at all.
+     A buyer should not need a browser trick to move faster through a 51-minute recording. */
+  .speed-row { display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .speed-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; }
+  .speed-btn { font: inherit; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+               border: 1px solid var(--border-accent); background: transparent; color: var(--muted); }
+  .speed-btn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); font-weight: 700; }
 </style>
 {% endblock %}
 
@@ -63,7 +71,17 @@ permalink: /start/thanks/
       <track kind="captions" src="/assets/captions/workshop-v2.vtt" srclang="en" label="English">
     </video>
   </div>
-  <p class="session-note">This is the session everyone else sees before they decide. Yours stops where the offer begins - you already took it. Scrub, pause, come back to it. It stays open.</p>
+
+  <div class="speed-row" role="group" aria-label="Playback speed">
+    <span class="speed-label">Speed</span>
+    <button type="button" class="speed-btn" data-rate="1" aria-pressed="true">1x</button>
+    <button type="button" class="speed-btn" data-rate="1.25" aria-pressed="false">1.25x</button>
+    <button type="button" class="speed-btn" data-rate="1.5" aria-pressed="false">1.5x</button>
+    <button type="button" class="speed-btn" data-rate="1.75" aria-pressed="false">1.75x</button>
+    <button type="button" class="speed-btn" data-rate="2" aria-pressed="false">2x</button>
+  </div>
+
+  <p class="session-note">This is the session everyone else sees before they decide. No pitching in your cut - just the story, and what actually stops working. The course keeps referring back to it. Scrub, pause, speed it up, come back to it - the link comes by email too, so you don't need to keep this page open.</p>
 
   <div class="next-steps">
     <p class="next-steps-heading">Next Steps</p>
@@ -129,6 +147,23 @@ permalink: /start/thanks/
   var v = document.getElementById('sessionVid');
   if (!v) return;
   v.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  // Playback speed. Native controls hide this (Chrome) or omit it entirely (Safari, iOS), so the
+  // buttons are ours. The rate is re-applied on loadedmetadata: setting playbackRate before the
+  // media is ready is silently dropped by some browsers, and a source swap resets it to 1.
+  var rate = 1;
+  var btns = document.querySelectorAll('.speed-btn');
+  function apply(r) {
+    rate = r;
+    try { v.playbackRate = r; } catch (e) {}
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute('aria-pressed', String(parseFloat(btns[i].dataset.rate) === r));
+    }
+  }
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function () { apply(parseFloat(this.dataset.rate)); });
+  }
+  v.addEventListener('loadedmetadata', function () { if (rate !== 1) { try { v.playbackRate = rate; } catch (e) {} } });
   if (window.posthog && window.posthog.capture) {
     v.addEventListener('play', function () { window.posthog.capture('friends_session_started'); }, { once: true });
   }
