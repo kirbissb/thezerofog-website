@@ -620,6 +620,7 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
 <section class="cardsec" id="card-sec">
   <canvas id="card-canvas" width="1200" height="630" role="img"></canvas>
   <div class="cardrow">
+    <button type="button" class="dl" id="card-share" hidden><svg viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M6 9V0.8M2.8 4 6 0.8 9.2 4M1 6.5v6.5h10V6.5"/></svg><span data-i18n="card_share">Share</span></button>
     <a class="dl" id="card-x" href="https://x.com/intent/post" target="_blank" rel="noopener"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M9.4 0.5h1.9L7.2 5.2l4.8 6.3H8.3L5.3 7.6 1.9 11.5H0l4.4-5L-0.2 0.5h3.8l2.7 3.6L9.4 0.5zm-0.7 9.9h1L3.3 1.6H2.2l6.5 8.8z"/></svg><span data-i18n="card_share_x">Share on X</span></a>
     <button type="button" class="dl" id="card-download"><svg viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M6 0v9M2 5.5 6 9.5l4-4M0 13h12"/></svg><span data-i18n="card_download">Save the image</span></button>
     <button type="button" class="dl" id="card-copy"><svg viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><rect x="3.5" y="3.5" width="8" height="10"/><path d="M8.5 3.5v-3h-8v10h3"/></svg><span id="card-copy-label" data-i18n="card_copy">Copy the image</span></button>
@@ -2467,6 +2468,10 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     "card_tweet": {
       "ru": "Работать ещё {n} {years}. Посчитал за минуту.",
       "en": "{n} {years} of work ahead of me. Took a minute to find out."
+    },
+    "card_share": {
+      "ru": "Поделиться",
+      "en": "Share"
     }
   };
 
@@ -4066,16 +4071,10 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     ctx.fillStyle = haze; ctx.fillRect(0, 0, W, H);
     ctx.textBaseline = "alphabetic";
 
-    // identity, and the expenses the figure belongs to
+    // identity only: the card carries the years and nothing about money (CEO 22.09)
     setFont(ctx, "400 19px", CARD_DISP, "3px");
     ctx.fillStyle = C_MID; ctx.textAlign = "left";
     ctx.fillText(m.identity.toUpperCase(), X0, 98);
-    setFont(ctx, "400 17px", CARD_TEXT, "2.5px");
-    var bw = ctx.measureText(m.badge).width;
-    ctx.strokeStyle = "rgba(236,234,228,.22)"; ctx.lineWidth = 1;
-    ctx.strokeRect(Math.round(X1 - bw - 36) + 0.5, 70.5, Math.round(bw + 36), 42);
-    ctx.fillStyle = C_HI;
-    ctx.fillText(m.badge, X1 - bw - 18, 98);
 
     var lineY = 548;
     // the path in miniature, same scale as on the page
@@ -4130,11 +4129,6 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     while (size > 22 && ux + ctx.measureText(m.unit).width > X1);
     ctx.fillStyle = C_HI;
     ctx.fillText(m.unit, ux, 436);
-    if (m.range) {
-      setFont(ctx, "300 25px", CARD_TEXT, "0px");
-      ctx.fillStyle = C_MID;
-      ctx.fillText(m.range, X0, 490);
-    }
     return c;
   }
 
@@ -4144,7 +4138,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     var m = lastHero;
     drawCard();
     if (!m) return;
-    $("card-canvas").setAttribute("aria-label", m.head + (m.range ? ". " + m.range : ""));
+    $("card-canvas").setAttribute("aria-label", m.head);
     setShareLink();
     if (!document.fonts || !document.fonts.load) return;
     var my = ++cardSeq;
@@ -4194,6 +4188,27 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     b.classList.toggle("done", !!done);
     setTimeout(function () { $("card-copy-label").textContent = raw("card_copy"); b.classList.remove("done"); }, 2600);
   }
+  /* Native share sheet (phones): the image travels as a file together with the text and
+     the link, so Instagram, Facebook, X or messengers get the card attached. Shown only
+     where the browser says it can share a PNG file. */
+  (function () {
+    var b = $("card-share");
+    if (!b || !navigator.share || !navigator.canShare || !window.File) return;
+    try { if (!navigator.canShare({ files: [new File([""], "t.png", { type: "image/png" })] })) return; }
+    catch (e) { return; }
+    b.hidden = false;
+    b.addEventListener("click", function () {
+      var c = drawCard(), m = lastHero;
+      if (!c || !m) return;
+      var text = m.never ? m.head : t("card_tweet", { n: m.numText, years: m.unit });
+      c.toBlob(function (blob) {
+        if (!blob) return;
+        var data = { files: [new File([blob], "financial-freedom.png", { type: "image/png" })], text: text + (SHARE_URL ? " " + SHARE_URL : "") };
+        navigator.share(data).catch(function () { /* closed by the person */ });
+      }, "image/png");
+    });
+  })();
+
   $("card-copy").addEventListener("click", function () {
     var c = drawCard();
     if (!c || !navigator.clipboard || !window.ClipboardItem) { copyLabel("card_copy_failed"); return; }
