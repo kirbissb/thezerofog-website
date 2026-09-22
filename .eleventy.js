@@ -33,6 +33,12 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.ignores.add("src/hours/**");
   eleventyConfig.addPassthroughCopy("src/hours");
 
+  // The financial-freedom calculator (self-contained HTML + data.js, served verbatim at
+  // /financial-freedom-calculator/). Generated - the source of truth is
+  // "Финансы личное/calculator/publish/build_site.py" in the sandbox. Edit there, never here.
+  eleventyConfig.ignores.add("src/financial-freedom-calculator/**");
+  eleventyConfig.addPassthroughCopy("src/financial-freedom-calculator");
+
   // Shared no-build JS modules (e.g. recovery tracker) served verbatim at /shared/*
   eleventyConfig.addPassthroughCopy("src/shared");
 
