@@ -239,6 +239,7 @@ button.plabel[aria-expanded="true"] .t{color:var(--amber)}   /* lit while its pa
 .mlegend b{display:block;font:200 26px/1.2 var(--text);color:var(--hi);white-space:nowrap}
 .mlegend div:last-child b{color:var(--amber)}
 .sooner{list-style:none;margin:0;padding:0}
+.l2twice{margin:18px 0 0;font:400 14px/1.5 var(--text);color:var(--mid)}
 .sooner li{display:grid;grid-template-columns:1fr;gap:6px 18px;align-items:baseline;padding:16px 0 18px;border-bottom:1px solid var(--hair2)}
 .sooner .sk{color:var(--mid);font-size:15px}
 .sooner .sd{font:300 19px/1.3 var(--text);color:var(--hi);white-space:nowrap}
@@ -691,6 +692,7 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
     <div id="sooner-sec">
       <h3 class="sechead" id="l2-rows-head"></h3>
       <ul class="sooner" id="sooner-list"></ul>
+      <p class="l2twice" id="l2-twice"></p>
     </div>
   </div>
 </section>
@@ -2409,6 +2411,14 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
   var $ = function (id) { return document.getElementById(id); };
   /* New strings for this variant, verbatim from variants/strings-new.json. */
   var NEW_STRINGS = {
+    "head_forever": {
+      "ru": "При этих числах - всегда",
+      "en": "With these numbers: forever"
+    },
+    "l2_twice": {
+      "ru": "Экономия работает дважды: вы вкладываете {amount}, и до конца жизни вам нужно меньше.",
+      "en": "Spending less counts twice: you invest the {amount}, and you need less for the rest of your life."
+    },
     "_note": "New strings for the redesign variants, EN and RU side by side. Same rules as ../strings.json: single hyphen only, no em dash, no arrows, no typed numbers - every figure arrives through a {placeholder}. Wording is PROPOSED and waits for the CEO; do not rewrite it, do not add keys without listing them in your report.",
     "goal_line": {
       "ru": "К этому времени у вас {target}. С этой суммы можно снимать {expenses} в месяц и не работать.",
@@ -3526,7 +3536,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     var m = { identity: raw("card_identity"),
               badge: t("card_badge", { amount: moneyShort(typedExpenses()) }).toUpperCase() };
     if (a.p50 === "never") {
-      m.never = true; m.head = raw("head_never"); m.range = "";
+      m.never = true; m.head = raw("head_forever");  /* CEO 30.09 (Misha): the page asks "how much longer", so the answer is "forever" */ m.range = "";
       return m;
     }
     var parts = spanParts(Number(a.p50) * 12, false);
@@ -3808,6 +3818,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     $("sooner-sec").hidden = rows.length === 0;
     if (!rows.length) return;
     $("l2-rows-head").innerHTML = tHtml("l2_rows_head", { amount: money(leverStep(r)) });
+    $("l2-twice").textContent = t("l2_twice", { amount: money(leverStep(r)) });  /* CEO 30.09: why spend-less beats earn-more */
     var longest = Math.max.apply(null, rows.map(function (x) { return x.months; }));
     rows.forEach(function (row) {
       var li = document.createElement("li");
