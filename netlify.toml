@@ -78,6 +78,20 @@
 # this section in the Netlify processing order, so keeping both would shadow
 # these rules).
 
+# The calculator was renamed 30.09.2026 (people search "fire calculator", not
+# "financial freedom calculator"): the old address keeps working, permanently.
+[[redirects]]
+  from = "/financial-freedom-calculator"
+  to = "/fire-calculator/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/financial-freedom-calculator/*"
+  to = "/fire-calculator/"
+  status = 301
+  force = true
+
 # Single stable checkout entry point used by EVERY sales email CTA and by ads.
 # Emails point at /enroll/ forever; when the founding window closes, or if the
 # checkout mechanism changes, only these two rules move - not 8 emails, the sales
