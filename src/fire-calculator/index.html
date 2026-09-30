@@ -238,14 +238,7 @@ button.plabel[aria-expanded="true"] .t{color:var(--amber)}   /* lit while its pa
 .mlegend div:last-child{text-align:right}
 .mlegend b{display:block;font:200 26px/1.2 var(--text);color:var(--hi);white-space:nowrap}
 .mlegend div:last-child b{color:var(--amber)}
-.sooner{list-style:none;margin:0;padding:0}
 .l2twice{margin:18px 0 0;font:400 14px/1.5 var(--text);color:var(--mid)}
-.sooner li{display:grid;grid-template-columns:1fr;gap:6px 18px;align-items:baseline;padding:16px 0 18px;border-bottom:1px solid var(--hair2)}
-.sooner .sk{color:var(--mid);font-size:15px}
-.sooner .sd{font:300 19px/1.3 var(--text);color:var(--hi);white-space:nowrap}
-.sooner .rbar{margin-top:6px}
-.sooner .rbar{grid-column:1 / -1;display:block;height:2px;border-radius:2px;width:calc(var(--f,0)*100%);min-width:2px;
-  background:linear-gradient(90deg,rgba(255,190,110,.55),var(--amber));box-shadow:0 0 12px rgba(var(--glow),.6);transition:width .5s ease}
 
 /* ---- layer 2: a second trajectory of light ---- */
 .l2{margin-top:60px}
@@ -505,9 +498,6 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
   .plabel{max-width:280px}
   .lower{margin-top:56px}
   .l2curve .plot{height:320px}
-  .sooner li{grid-template-columns:1fr auto;gap:10px 18px}
-  .sooner .sd{font-size:17px;text-align:right}
-  .sooner .rbar{margin-top:0}
   .l2grid{grid-template-columns:5fr 6fr;gap:96px;margin-top:48px;align-items:start}
   .l2say{font-size:36px}
   .takes td{font-size:30px;padding:22px 0 22px 16px}
@@ -689,11 +679,8 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
   </div>
   <div class="l2grid">
     <p class="l2say" data-i18n="l2_head">The first hundreds buy years.</p>
-    <div id="sooner-sec">
-      <h3 class="sechead" id="l2-rows-head"></h3>
-      <ul class="sooner" id="sooner-list"></ul>
-      <p class="l2twice" id="l2-twice"></p>
-    </div>
+    <!-- the "What $100 a month gets you" rows were taken off 01.10 (CEO): they repeated the
+         ladder on a what-if path that kept the fund's old size, so one move read a month apart -->
   </div>
 </section>
 
@@ -706,6 +693,7 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
   <div class="nxladder" id="nx-ladder-sec" hidden>
     <h3 class="sechead" data-i18n="nx_ladder_head">What brings your freedom closer</h3>
     <ul class="ladder nxbody" id="nx-ladder"></ul>
+    <p class="l2twice" id="l2-twice" hidden></p>
   </div>
   <div class="nxrev" id="nx-rev-sec">
     <h3 class="sechead" data-i18n="nx_rev_head">Free on your own date</h3>
@@ -3066,15 +3054,6 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     var d = derivedSaving();
     return Math.max(0, d + delta) - Math.max(0, d);
   }
-  function movesForRun() {
-    return MOVE_SPECS.map(function (sp) {
-      if (!sp.saving) return sp;
-      var c = {}, k;
-      for (k in sp) { if (Object.prototype.hasOwnProperty.call(sp, k)) c[k] = sp[k]; }
-      c.saving = moveSaving(sp.saving);
-      return c;
-    });
-  }
 
   function renderSavingLine() {
     var d = derivedSaving();
@@ -3315,7 +3294,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
       seq: seq, scenario: sc, scenarioAlt: scAlt, data: D,
       calibration: null,
       solve: needSolve ? { horizons: SAVING_HORIZONS, coverages: cov } : null,
-      moves: movesForRun()
+      moves: null        // since 01.10 the headline run carries no what-if moves: the ladder's full runs do
     };
     if (worker) {
       worker.postMessage(msg);
@@ -3496,8 +3475,6 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     renderPath(r, lo, hi);
     renderBar(hi);
     renderTakes(r, hi);
-    MOVE_SPECS = speedupSpecs(r);
-    renderSooner(r);
     $("lower").hidden = $("bar-sec").hidden;
     $("l2").hidden = !!(lastHero && lastHero.never);        // CEO 30.09: no empty curve section on "never"
     $("results").setAttribute("data-seq", seq);
@@ -3769,66 +3746,12 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
   }
 
 
-  /* Three EQUAL steps, so the two actions can be compared: each is the engine's own
-     lever step, read off its lever key, so a change there moves these too. */
-  function speedupSpecs(r) {
-    var step = leverStep(r);
-    return [
-      { key: "earn", saving: step },
-      { key: "spend", expenses: -step, saving: step },
-      { key: "both", expenses: -step, saving: 2 * step }
-    ];
-  }
-
-  function speedupLabel(sp, r) {
-    var step = 100;
-    r.levers.forEach(function (l) {
-      var m = l.key.match(/^income_plus_([\d.]+)$/);
-      if (m) step = parseFloat(m[1]);
-    });
-    if (sp.key === "earn") return t("sooner_earn", { a: money(step) });
-    if (sp.key === "spend") return t("sooner_spend", { a: money(step) });
-    if (sp.key === "both") return raw("sooner_both");
-    if (sp.key === "mix") {
-      var w = sp.alloc || {};
-      var parts = Object.keys(w).filter(function (k) { return w[k] > 0; })
-        .map(function (k) { return w[k] + "% " + shortName(k); });
-      return t("sooner_mix", { mix: parts.join(" / ") });
-    }
-    return sp.key;
-  }
 
   function deltaWords(months) {
     if (typeof months !== "number" || Math.round(Math.abs(months) * 52 / 12) < 1) return "";
     return t(months > 0 ? "sooner_delta_span" : "later_delta_span", { span: spanYM(Math.abs(months)) });
   }
 
-  /* Three rows, always earn, spend, both. One bar each, all on one scale: the longest
-     is the full width, so the gap between spending less and earning more is seen
-     before anything is read. A row the engine cannot answer is not drawn. */
-  function renderSooner(r) {
-    var ul = $("sooner-list");
-    ul.innerHTML = "";
-    var ORDER = ["earn", "spend", "both"];
-    var rows = (r.speedups || []).filter(function (sp) {
-      return ORDER.indexOf(sp.key) >= 0 && sp.available && finite(sp.p50)
-        && typeof sp.months === "number" && Math.round(sp.months * 52 / 12) >= 1;
-    }).map(function (sp) { return { key: sp.key, label: speedupLabel(sp, r), months: sp.months }; });
-    rows.sort(function (x, y) { return ORDER.indexOf(x.key) - ORDER.indexOf(y.key); });
-    $("sooner-sec").hidden = rows.length === 0;
-    if (!rows.length) return;
-    $("l2-rows-head").innerHTML = tHtml("l2_rows_head", { amount: money(leverStep(r)) });
-    $("l2-twice").textContent = t("l2_twice", { amount: money(leverStep(r)) });  /* CEO 30.09: why spend-less beats earn-more */
-    var longest = Math.max.apply(null, rows.map(function (x) { return x.months; }));
-    rows.forEach(function (row) {
-      var li = document.createElement("li");
-      li.innerHTML = '<span class="sk">' + escapeHtml(row.label) + "</span>"
-        + '<span class="sd">' + escapeHtml(deltaWords(row.months)) + "</span>"
-        + '<i class="rbar" aria-hidden="true"></i>';
-      li.lastChild.style.setProperty("--f", Math.max(0, row.months / longest));
-      ul.appendChild(li);
-    });
-  }
 
   function renderTakes(r, hi) {
     var never = hi.accumulation.p50 === "never";
@@ -4480,6 +4403,9 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     /* strongest first */
     rows.sort(function (x, y) { return y.months - x.months; });
     NX.shown = rows;
+    var twice = $("l2-twice");   /* CEO 30.09 wording, under the ladder since 01.10: why spend-less ranks first */
+    twice.hidden = !rows.some(function (x) { return x.key === "spend" && x.months > 0; });
+    twice.textContent = twice.hidden ? "" : t("l2_twice", { amount: money(NX.step) });
     $("nx-ladder-sec").hidden = rows.length === 0;
     var longest = Math.max.apply(null, rows.map(function (x) { return Math.abs(x.months); }).concat([1e-9]));
     rows.forEach(function (row) {
