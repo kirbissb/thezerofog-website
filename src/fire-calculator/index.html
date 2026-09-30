@@ -6,18 +6,18 @@
 <title>FIRE Calculator - How Much Longer Will You Work?</title>
 <meta name="description" content="Income and expenses in, years of work out. 10,000 runs over real market years since 1928, with capital-gains tax and the months you will miss. Arithmetic only, nothing is stored.">
 <link rel="canonical" href="https://thezerofog.com/fire-calculator/">
-<meta property="og:title" content="How much longer do I have to work?">
+<meta property="og:title" content="When can you stop working for good?">
 <meta property="og:description" content="Income and expenses in, years of work out. 10,000 runs over real market years since 1928, with capital-gains tax and the months you will miss. Arithmetic only, nothing is stored.">
 <meta property="og:url" content="https://thezerofog.com/fire-calculator/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Zero Fog">
-<meta property="og:image" content="https://thezerofog.com/assets/og/financial-freedom.png">
+<meta property="og:image" content="https://thezerofog.com/assets/og/fire-calculator.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="How much longer do I have to work?">
+<meta property="og:image:alt" content="When can you stop working for good?">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://thezerofog.com/assets/og/financial-freedom.png">
-<meta name="twitter:title" content="How much longer do I have to work?">
+<meta name="twitter:image" content="https://thezerofog.com/assets/og/fire-calculator.png">
+<meta name="twitter:title" content="When can you stop working for good?">
 <meta name="twitter:description" content="Income and expenses in, years of work out. 10,000 runs over real market years since 1928, with capital-gains tax and the months you will miss. Arithmetic only, nothing is stored.">
 <meta name="theme-color" content="#090d12">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23090d12'/%3E%3Cpath d='M1 11h14' stroke='%23ffb24d' stroke-width='1.2'/%3E%3Ccircle cx='11' cy='11' r='2' fill='%23ffb24d'/%3E%3C/svg%3E">
@@ -299,6 +299,87 @@ button.plabel[aria-expanded="true"] .t{color:var(--amber)}   /* lit while its pa
 .pbreak{left:calc(var(--line-x) - 5px);width:10px;top:calc(100% - 46px);height:36px;
   background:repeating-linear-gradient(180deg,var(--amber) 0 4px,transparent 4px 9px) center / 2px 100% no-repeat,var(--ink)}
 
+/* ---- NEXT (prototype 30.09): ladder, reverse question, main finding ---- */
+.nx{margin-top:64px;display:grid;grid-template-columns:minmax(0,1fr);gap:56px}
+.nx > div{min-width:0}
+.nx.stale .nxbody{opacity:.3;transition:opacity .35s}
+.nxcap{display:block;margin:0 0 18px;font:400 11px/1.4 var(--text);letter-spacing:.16em;text-transform:uppercase;color:var(--mid)}
+.ladder{list-style:none;margin:0;padding:0}
+.ladder li{display:grid;grid-template-columns:1fr;gap:6px 18px;align-items:baseline;padding:16px 0 18px;border-bottom:1px solid var(--hair2)}
+.ladder .sk{color:var(--mid);font-size:15px}
+.ladder .sd{font:300 19px/1.3 var(--text);color:var(--hi);white-space:nowrap}
+.ladder .sn{font-size:13px;color:var(--dim);white-space:nowrap}
+.ladder .rbar{grid-column:1 / -1;display:block;height:2px;border-radius:2px;width:calc(var(--f,0)*100%);min-width:2px;margin-top:6px;
+  background:linear-gradient(90deg,rgba(255,190,110,.55),var(--amber));box-shadow:0 0 12px rgba(var(--glow),.6);transition:width .5s ease}
+.ladder li.loss .sd{color:var(--mid)}
+.ladder li.loss .rbar{background:rgba(236,234,228,.35);box-shadow:none}
+.revrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:17px;color:var(--mid)}
+.revnum{display:inline-flex;align-items:center;gap:14px;flex:none;white-space:nowrap}  /* input and "years" never part (390 px fix 30.09) */
+.revrow .moneyrow{flex:0 0 76px;width:76px;min-width:0}
+.revrow .moneyrow input{width:100%;min-width:0}
+.nxcmp{min-width:0}
+.viewseg{order:0;margin:0 0 4px -8px;flex-wrap:nowrap;gap:2px;max-width:calc(100% + 8px)}
+.viewseg{align-items:stretch}
+.viewseg label{padding:0 8px;flex:0 1 auto;min-width:0;align-items:flex-end}   /* a long label wraps inside its tab; both underlines stay on one baseline */
+.viewseg span{letter-spacing:.07em;line-height:1.35;text-align:left}
+.cmpbig.cmphabit{margin-top:16px;font-size:19px}
+.cmppanel{order:3;padding-top:6px}
+.cmppanel .cmpin{max-width:560px}
+/* the compare tab folds the inputs into one line (CEO 30.09) */
+.insum{justify-self:start;display:inline;background:none;border:0;padding:10px 0;min-height:44px;cursor:pointer;text-align:left;
+  font:300 17px/1.45 var(--text);color:var(--hi)}
+.insumedit{color:var(--amber);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:5px;white-space:nowrap}
+.insum:hover .insumedit{color:var(--hi)}
+body.view-cmp.in-closed #step-numbers > :not(#in-summary){display:none !important}
+/* the compare tab: only the inputs and the compare block; everything of the main answer steps aside */
+body.view-cmp .herobox,body.view-cmp .herotail,body.view-cmp #path,body.view-cmp #lower,body.view-cmp #l2,body.view-cmp #nx,
+body.view-cmp #panel-takes,body.view-cmp #fold-basis,body.view-cmp #card-sec{display:none !important}
+.cmpintro{margin:-8px 0 26px;font-size:15px;color:var(--mid);max-width:34em}
+.cmpgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+.cmpgrid > div{min-width:0}
+.cmprow{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:18px;align-items:end;margin-bottom:14px}
+.cmprow[hidden]{display:none}
+.cmpname{width:100%;min-width:0;height:48px;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;outline:0;padding:0;
+  font:300 19px/48px var(--text);color:var(--hi);caret-color:var(--amber);transition:border-color .3s}
+.cmpname:focus{border-bottom-color:var(--amber)}
+.cmpname::placeholder,.cmpprice::placeholder{color:var(--low)}
+.cmprow .moneyrow{padding-bottom:0}
+.cmprow .moneyrow input{font-size:26px}
+.cmpfreq{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:8px;font-size:15px;color:var(--mid)}
+.cmpfreq select{min-height:44px;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a0a7af'/%3E%3C/svg%3E") right 2px center no-repeat;
+  -webkit-appearance:none;appearance:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 20px 0 0;
+  font:300 17px/1.2 var(--text);color:var(--hi);cursor:pointer}
+.cmpfreq select:focus{outline:0;border-bottom-color:var(--amber)}
+.cmpfreq option{background:var(--ink);color:var(--hi)}
+.cmpres{margin:0 0 22px;padding:0 0 22px;border-bottom:1px solid var(--hair2)}
+.cmpres:last-child{margin-bottom:0}
+.cmpvs{margin:0 0 12px;font:400 14px/1.4 var(--disp);color:var(--hi);overflow-wrap:anywhere}
+.cmplab{display:block;margin:12px 0 4px;font-size:13px;color:var(--dim)}
+.cmpbig{margin:0;font:300 22px/1.3 var(--text);color:var(--hi)}
+.cmpbig .fig{color:var(--amber);white-space:nowrap}
+.cmpmsg{margin:0;font-size:15px;color:var(--mid)}
+.cmpmsg + .cmpres{margin-top:22px}
+.cmpres + .cmpmsg{margin-top:22px}
+
+.revans{margin:22px 0 0;font:300 25px/1.28 var(--disp);color:var(--hi);text-wrap:balance}
+.revans .fig{color:var(--amber);text-shadow:0 0 30px rgba(var(--glow),.3)}
+.revgap{margin:10px 0 0;font-size:15px;color:var(--mid)}
+.revgap .fig{color:var(--hi);white-space:nowrap}
+@media (min-width:760px){
+  .nx{margin-top:84px;grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:96px;row-gap:64px;align-items:start}
+  .nx .nxladder{grid-column:2;grid-row:1}
+  .nx .nxrev{grid-column:1;grid-row:1}
+  .viewseg{margin-bottom:22px;gap:4px}
+  .viewseg label{padding:0 10px}
+  .viewseg span{letter-spacing:.14em}
+  .cmpbig.cmphabit{font-size:21px}
+  .cmpbig{font-size:25px}
+  .ladder li{grid-template-columns:1fr auto;gap:4px 18px}
+  .ladder .sd{font-size:17px;text-align:right}
+  .ladder .sn{grid-column:2;text-align:right}
+  .revans{font-size:32px}
+}
+
 /* ---- what it would take ---- */
 .takespanel{margin-top:44px}
 .takes{width:100%;border-collapse:collapse;font-size:14px}
@@ -447,13 +528,15 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
 
 <header class="mast">
   <h1 data-i18n="title">How many more years of work</h1>
-  <div class="seg langseg" id="seg-lang" role="group" aria-label="Language"></div>
+  <div class="seg langseg" id="seg-lang" style="display:none" role="group" aria-label="Language"></div>
 </header>
 
 <div class="stage">
 
 <!-- ================= THE INPUTS ================= -->
 <section class="inputs" id="step-numbers">
+  <!-- compare tab only (CEO 30.09): the inputs fold into one line; a tap opens them in place -->
+  <button type="button" class="insum" id="in-summary" hidden><span id="in-summary-text"></span> <span class="insumedit" data-i18n="nx_in_edit">edit</span></button>
   <div class="field">
     <label for="in-income" data-i18n="in_income">Income, take-home a month</label>
     <div class="moneyrow"><span class="pfx">$</span>
@@ -496,10 +579,16 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
       <input id="in-saving" type="number" min="0" step="50" inputmode="numeric" enterkeyhint="done" autocomplete="off" aria-labelledby="saving-line"></div>
     <button type="button" class="quiet" id="saving-toggle" data-i18n="saving_toggle_on">Not all of it gets invested</button>
   </div>
+  <button type="button" class="quiet" id="in-fold" hidden data-i18n="nx_in_fold">collapse</button>
 </section>
 
 <!-- ================= THE ANSWER ================= -->
 <section class="answer" id="results" aria-live="polite">
+  <!-- tabs (CEO 30.09): the main answer, or compare purchases on the same inputs -->
+  <div class="seg viewseg" id="view-tabs" role="group">
+    <label><input type="radio" name="view" value="main" checked><span data-i18n="nx_tab_main">How long to work</span></label>
+    <label><input type="radio" name="view" value="cmp"><span data-i18n="nx_tab_cmp">Which buy frees you sooner</span></label>
+  </div>
   <span class="sr" id="busy" hidden data-i18n="busy">calculating</span>
   <div class="err" id="err" hidden></div>
   <div class="herobox">
@@ -517,6 +606,19 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
   <div class="herotail">
     <p class="needbig" id="need-big" hidden></p>
     <p class="goal" id="goal-line"></p>
+  </div>
+  <div class="nxcmp cmppanel" id="nx-cmp-sec" hidden>
+    <p class="cmpintro" data-i18n="nx_cmp_intro"></p>
+    <div class="cmpgrid">
+      <div class="cmpin">
+        <div class="cmprow" data-i="0"><input class="cmpname" type="text" maxlength="40" autocomplete="off" enterkeyhint="next"><span class="moneyrow"><span class="pfx">$</span><input class="cmpprice" type="number" min="0" step="1" inputmode="numeric" enterkeyhint="done" autocomplete="off"></span></div>
+        <div class="cmprow" data-i="1"><input class="cmpname" type="text" maxlength="40" autocomplete="off" enterkeyhint="next"><span class="moneyrow"><span class="pfx">$</span><input class="cmpprice" type="number" min="0" step="1" inputmode="numeric" enterkeyhint="done" autocomplete="off"></span></div>
+        <div class="cmprow" data-i="2" hidden><input class="cmpname" type="text" maxlength="40" autocomplete="off" enterkeyhint="next"><span class="moneyrow"><span class="pfx">$</span><input class="cmpprice" type="number" min="0" step="1" inputmode="numeric" enterkeyhint="done" autocomplete="off"></span></div>
+        <button type="button" class="quiet" id="nx-cmp-add" data-i18n="nx_cmp_add">+ one more option</button>
+        <div class="cmpfreq"><label for="nx-cmp-freq" data-i18n="nx_cmp_freq">You buy it</label><select id="nx-cmp-freq"></select></div>
+      </div>
+      <div class="cmpout nxbody" id="nx-cmp-out" aria-live="polite"></div>
+    </div>
   </div>
 </section>
 
@@ -589,6 +691,29 @@ body.intro .endless::before{animation:drawh 1.7s cubic-bezier(.45,.05,.25,1) .25
     <div id="sooner-sec">
       <h3 class="sechead" id="l2-rows-head"></h3>
       <ul class="sooner" id="sooner-list"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NEXT (prototype 30.09): three result blocks =================
+     Every figure here is a full FI.runScenario run on a worker of its own, asked for
+     only after the headline has painted. -->
+<section class="nx" id="nx" hidden>
+  <!-- the "main finding" block and the card's "My finding" option were taken off 30.09 (CEO):
+       the years card is the only share card -->
+  <div class="nxladder" id="nx-ladder-sec" hidden>
+    <h3 class="sechead" data-i18n="nx_ladder_head">What brings your freedom closer</h3>
+    <ul class="ladder nxbody" id="nx-ladder"></ul>
+  </div>
+  <div class="nxrev" id="nx-rev-sec">
+    <h3 class="sechead" data-i18n="nx_rev_head">Free on your own date</h3>
+    <div class="revrow">
+      <label for="nx-years" data-i18n="nx_rev_label">I want to be free in</label>
+      <span class="revnum"><span class="moneyrow"><input id="nx-years" type="number" min="1" max="60" step="1" inputmode="numeric" enterkeyhint="done" autocomplete="off" value="15"></span><span id="nx-years-sfx"></span></span>
+    </div>
+    <div class="nxbody" id="nx-rev-body">
+      <p class="revans" id="nx-rev-ans"></p>
+      <p class="revgap" id="nx-rev-gap"></p>
     </div>
   </div>
 </section>
@@ -2472,11 +2597,185 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     "card_share": {
       "ru": "Поделиться",
       "en": "Share"
+    },
+    /* ---- NEXT prototype 30.09: DRAFT strings, pending CEO approval (variants/strings-next-DRAFT.md) ---- */
+    "nx_ladder_head": {
+      "ru": "Что сильнее всего приближает свободу",
+      "en": "What brings your freedom closest"
+    },
+    "nx_lv_capital": {
+      "ru": "Иметь уже сейчас на {a} больше вложений",
+      "en": "Have {a} more invested today"
+    },
+    "nx_lv_term": {
+      "ru": "работать {span}",
+      "en": "{span} of work"
+    },
+    "nx_rev_head": {
+      "ru": "Свобода к вашему сроку",
+      "en": "Free by your own date"
+    },
+    "nx_rev_label": {
+      "ru": "Хочу быть свободным через",
+      "en": "I want to be free in"
+    },
+    "nx_rev_answer": {
+      "ru": "Для этого нужно вкладывать {amount} в месяц.",
+      "en": "For that, invest {amount} a month."
+    },
+    "nx_rev_more": {
+      "ru": "Это на {amount} в месяц больше, чем сейчас.",
+      "en": "That's {amount} a month more than now."
+    },
+    "nx_rev_less": {
+      "ru": "Это на {amount} в месяц меньше, чем вы вкладываете сейчас.",
+      "en": "That's {amount} a month less than you invest now."
+    },
+    "nx_rev_same": {
+      "ru": "Ровно столько вы и вкладываете сейчас.",
+      "en": "That's what you invest now."
+    },
+    "nx_rev_zero": {
+      "ru": "Вы успеете, даже если больше ничего не будете вкладывать.",
+      "en": "You'll make it even if you invest nothing more."
+    },
+    "nx_rev_none": {
+      "ru": "Только за счёт вложений за {span} не успеть.",
+      "en": "Investing alone won't get you there in {span}."
+    },
+    /* ---- NEXT compare block 30.09: DRAFT strings (variants/strings-next-DRAFT.md) ---- */
+    "nx_cmp_intro": {
+      "ru": "Два-три варианта одной покупки. Посмотрите, насколько раньше придёт свобода, если взять вариант дешевле.",
+      "en": "Two or three options for the same thing. See how much sooner the cheaper one makes you free."
+    },
+    "nx_cmp_opt": {
+      "ru": "Пример {n}",
+      "en": "Example {n}"
+    },
+    "nx_cmp_name_aria": {
+      "ru": "Что за вариант {n}",
+      "en": "What option {n} is"
+    },
+    "nx_cmp_price_aria": {
+      "ru": "Цена варианта {n}",
+      "en": "Price of option {n}"
+    },
+    "nx_cmp_add": {
+      "ru": "+ ещё вариант",
+      "en": "+ one more option"
+    },
+    "nx_cmp_freq": {
+      "ru": "Покупаете",
+      "en": "You buy it"
+    },
+    "nx_cmp_once": {
+      "ru": "один раз",
+      "en": "once"
+    },
+    "nx_cmp_every1": {
+      "ru": "каждый год",
+      "en": "every year"
+    },
+    "nx_cmp_everyn": {
+      "ru": "раз в {n} {years}",
+      "en": "every {n} {years}"
+    },
+    "nx_cmp_vs": {
+      "ru": "{b}, а не {a}",
+      "en": "{b} instead of {a}"
+    },
+    "nx_cmp_now": {
+      "ru": "Эта покупка",
+      "en": "This purchase"
+    },
+    "nx_cmp_big": {
+      "ru": "{amount}: примерно на {span} раньше",
+      "en": "{amount}: about {span} sooner"
+    },
+    "nx_cmp_big_lt": {
+      "ru": "{amount}: меньше чем на день раньше",
+      "en": "{amount}: less than a day sooner"
+    },
+    "nx_cmp_never": {
+      "ru": "При этих числах свобода пока не видна, поэтому дни не посчитать. Но разница всё равно остаётся у вас:",
+      "en": "With these numbers freedom is not in sight yet, so there are no days to count. The difference is still yours:"
+    },
+    "nx_cmp_keep": {
+      "ru": "{amount} остаются у вас",
+      "en": "{amount} stays with you"
+    },
+    "nx_cmp_need2": {
+      "ru": "Впишите хотя бы две цены.",
+      "en": "Enter at least two prices."
+    },
+    "nx_cmp_same": {
+      "ru": "{b} стоит столько же, сколько {a}.",
+      "en": "{b} costs the same as {a}."
+    },
+    "nx_cmp_wait": {
+      "ru": "Считаю...",
+      "en": "Counting..."
+    },
+    "nx_tab_main": {
+      "ru": "Сколько ещё работать",
+      "en": "How long to work"
+    },
+    "nx_tab_cmp": {
+      "ru": "Какая покупка приблизит свободу",
+      "en": "Which buy frees you sooner"
+    },
+    "nx_cmp_fill": {
+      "ru": "Сначала впишите доход и расходы.",
+      "en": "Fill in your income and expenses first."
+    },
+    "nx_cmp_habit_line": {
+      "ru": "Если всегда покупать так ({every}): примерно на {span} раньше",
+      "en": "If you always buy this way ({every}): about {span} sooner"
+    },
+    "nx_cmp_habit_line_lt": {
+      "ru": "Если всегда покупать так ({every}): меньше чем на день раньше",
+      "en": "If you always buy this way ({every}): less than a day sooner"
+    },
+    "nx_cmp_keep_every": {
+      "ru": "{amount} остаются у вас {every}",
+      "en": "{amount} stays with you {every}"
+    },
+    "nx_in_sum": {
+      "ru": "{income} в месяц · {expenses} траты",
+      "en": "{income} a month · {expenses} spending"
+    },
+    "nx_in_edit": {
+      "ru": "изменить",
+      "en": "edit"
+    },
+    "nx_in_fold": {
+      "ru": "свернуть",
+      "en": "collapse"
+    },
+    "nx_cmp_price_ph": {
+      "ru": "цена",
+      "en": "price"
+    },
+    "nx_card_pre": {
+      "ru": "Я могу навсегда перестать работать через",
+      "en": "I can retire in"
+    },
+    "nx_card_ask": {
+      "ru": "Узнайте, когда сможете вы",
+      "en": "Find out when you can retire"
+    },
+    "nx_card_share": {
+      "ru": "Я могу навсегда перестать работать через {n} {years}. Узнайте, когда сможете вы:",
+      "en": "I can retire in {n} {years}. Find out when you can retire:"
+    },
+    "nx_plural_day": {
+      "ru": "день|дня|дней",
+      "en": "day|days|days"
     }
   };
 
   // ---- language ----------------------------------------------------------
-  var LANGS = D.strings.languages;
+  var LANGS = ["en"];
   var LANG = D.strings.default;
   var STORE_KEY = "fi-calc-lang";
   /* First visit: follow the browser's language when we have it; a saved choice
@@ -2921,6 +3220,24 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     return document.getElementById("fi-core-src").textContent
       + "\nvar __DATA=null;\nself.onmessage=function(e){\n"
       + "  if (e.data.data) { __DATA = e.data.data; }\n"
+      + "  if (e.data.next) {\n"
+      + "    try {\n"
+      + "      if (e.data.solve) {\n"
+      + "        var sr = FI.runScenario(e.data.scenario, __DATA,\n"
+      + "            {calibration: null, skipLevers: true, solveSaving: e.data.solve});\n"
+      + "        self.postMessage({next:true, kind:'solve', seq:e.data.seq, tag:e.data.tag, ok:true, savingNeeded: sr.savingNeeded});\n"
+      + "      } else {\n"
+      + "        var outs = e.data.runs.map(function (j) {\n"
+      + "          var a = FI.runScenario(j.scenario, __DATA, {calibration: null, skipLevers: true}).accumulation;\n"
+      + "          return {key: j.key, p10: a.p10, p50: a.p50, p90: a.p90};\n"
+      + "        });\n"
+      + "        self.postMessage({next:true, kind:'ladder', seq:e.data.seq, tag:e.data.tag, ok:true, runs: outs});\n"
+      + "      }\n"
+      + "    } catch (err3) {\n"
+      + "      self.postMessage({next:true, kind: e.data.solve ? 'solve' : 'ladder', seq:e.data.seq, tag:e.data.tag, ok:false, error: String(err3 && err3.message || err3)});\n"
+      + "    }\n"
+      + "    return;\n"
+      + "  }\n"
       + "  if (e.data.curve) {\n"
       + "    try {\n"
       + "      var cr = FI.runScenario(e.data.scenario, __DATA,\n"
@@ -2963,6 +3280,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     try { updateSummaries(lastReport, lastAlt, lastReport); } catch (e) { /* first paint */ }
     resetSlider();
     $("l2-curve").classList.add("stale");
+    $("nx").classList.add("stale");
     if (timer) clearTimeout(timer);
     $("busy").hidden = false;
     /* leaving the veil waits for a pause in typing, so the one reveal is not spent on
@@ -3105,7 +3423,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
   }
 
   function setStartChrome(on) {
-    ["panel-takes", "lower", "l2", "fold-basis", "card-sec", "derived"].forEach(function (id) {
+    ["panel-takes", "lower", "l2", "nx", "fold-basis", "card-sec", "derived"].forEach(function (id) {
       if (on) $(id).hidden = true;
     });
     if (!on) { $("fold-basis").hidden = false; $("card-sec").hidden = false; $("derived").hidden = false; }
@@ -3154,6 +3472,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     layoutPath();
     if (!was && !introPlayed) playIntro(false);
     else if (!was) document.body.classList.remove("pre");
+    if (typeof NX !== "undefined" && NX && NX.cmp) renderCmp();   // the compare tab asks for the inputs
   }
 
   function render(r, alt) {
@@ -3163,16 +3482,19 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     veiled = false;
     setStartChrome(false);
     renderHero(r, lo, hi, first);
+    $("card-sec").hidden = !!(lastHero && lastHero.never);   // CEO 30.09: no share card when the answer is "never"
     renderPath(r, lo, hi);
     renderBar(hi);
     renderTakes(r, hi);
     MOVE_SPECS = speedupSpecs(r);
     renderSooner(r);
     $("lower").hidden = $("bar-sec").hidden;
-    $("l2").hidden = false;
+    $("l2").hidden = !!(lastHero && lastHero.never);        // CEO 30.09: no empty curve section on "never"
     $("results").setAttribute("data-seq", seq);
     if (CURVE && CURVE.seq === seq) renderLayer2();         // same numbers, new language or width
     else setTimeout(requestCurve, 30);                      // after the headline has painted
+    NX.times.heroPainted = performance.now();
+    setTimeout(requestNext, 40);                            // the three NEXT blocks, also after the headline
     gapSuffix();
     computeTopLever(r);
     renderAssumeLine(r);
@@ -3217,6 +3539,8 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     m.pre = (head[0] || "").replace(/\s+$/, "");
     m.unit = (head[1] || "").replace(/^\s+/, "");
     m.head = m.pre + " " + m.numText + " " + m.unit;
+    m.spanUnit = unit;                 // "years" / "months" as the span helper gives them (the card's own frame)
+    m.cardLine = t("nx_card_share", { n: m.numText, years: unit });   // the share text; the page link follows it
     m.range = (a.p10 === "never" || a.p90 === "never") ? ""
       : t("head_luck_span", { a: num(Math.round(a.p10), 0), b: num(Math.round(a.p90), 0),
                               years: genitive("plural_year") });
@@ -4007,6 +4331,447 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
   $("l2-reset").addEventListener("click", function () { resetSlider(); try { $("l2-range").focus({ preventScroll: true }); } catch (e) { /* fine */ } });
   window.addEventListener("resize", renderLayer2);
 
+  // ---- NEXT (prototype 30.09): lever ladder, reverse question, main finding ----
+  /* Three blocks under layer 2. Every figure is a FULL FI.runScenario run with the
+     changed inputs (skipLevers, same seed), on workers of their own, asked for only
+     after the headline has painted - so the first number never waits for them, and a
+     move that changes the expenses also resizes the emergency fund, as a real re-run
+     of the person's numbers would. Nothing here re-implements the engine. */
+  var NX_CAPITAL = 10000;        // the "already invested +$10,000" move: a page constant (brief 30.09)
+  var NX_YEARS_DEFAULT = 15;     // the reverse question's starting target, years
+  var NX = { seq: -1, base: null, step: 100, rows: null,
+             solve: null, solveSeq: -1, solveTag: null, times: {} };
+  window.__NX = NX;              // read by tools/verify_next.py
+  var NXW = {}, nxTimer = null, cmpTimer = null;   // one worker per kind: ladder, solve, cmp, cmpd
+
+  /* The insurance move was taken out of the ladder 30.09 (brief): the premium is unknown
+     per person, so "get insurance -> N months sooner" counted the benefit without the
+     cost. The insurance switch in the inputs stays and still shapes every run. */
+
+  function nxBaseScenario() {
+    var cov = coverageShares();
+    return buildScenario(cov[cov.length - 1]);
+  }
+
+  function nxRuns(base, step) {
+    function clone() { return JSON.parse(JSON.stringify(base)); }
+    var runs = [], sc;
+    if (base.expenses_monthly - step >= 0) {
+      sc = clone();
+      sc.expenses_monthly = base.expenses_monthly - step;
+      sc.monthly_saving = base.monthly_saving + moveSaving(step);
+      runs.push({ key: "spend", scenario: sc });
+    }
+    sc = clone();
+    sc.monthly_saving = base.monthly_saving + moveSaving(step);
+    runs.push({ key: "earn", scenario: sc });
+    sc = clone();
+    sc.starting_capital = base.starting_capital + NX_CAPITAL;
+    runs.push({ key: "capital", scenario: sc });
+    return runs;
+  }
+
+  function nxPost(kind, msg, onDone) {
+    /* one worker per kind, so no block queues behind another; a newer ask of the
+       same kind terminates the older one */
+    var st = NXW[kind] || (NXW[kind] = { w: null, busy: false });
+    try {
+      if (!worker) throw new Error("no worker");
+      if (st.w && st.busy) { st.w.terminate(); st.w = null; }
+      if (!st.w) st.w = new Worker(URL.createObjectURL(new Blob([workerSource()], { type: "text/javascript" })));
+      st.busy = true;
+      st.w.onmessage = function (e) { st.busy = false; onDone(e.data); };
+      st.w.onerror = function () { st.busy = false; st.w = null; };
+      msg.data = D;
+      st.w.postMessage(msg);
+    } catch (e) {
+      st.w = null; st.busy = false;
+      setTimeout(function () {
+        try {
+          if (msg.solve) {
+            var sr = FI.runScenario(msg.scenario, D, { calibration: null, skipLevers: true, solveSaving: msg.solve });
+            onDone({ ok: true, seq: msg.seq, tag: msg.tag, savingNeeded: sr.savingNeeded });
+          } else {
+            onDone({ ok: true, seq: msg.seq, tag: msg.tag, runs: msg.runs.map(function (j) {
+              var a = FI.runScenario(j.scenario, D, { calibration: null, skipLevers: true }).accumulation;
+              return { key: j.key, p10: a.p10, p50: a.p50, p90: a.p90 };
+            }) });
+          }
+        } catch (err) { /* the page stands without these blocks */ }
+      }, 80);
+    }
+  }
+
+  function nxYears() {
+    var v = Math.round(numOf("nx-years"));
+    return Math.max(1, Math.min(60, v || NX_YEARS_DEFAULT));
+  }
+
+  function requestNext() {
+    if (!lastReport || veiled) return;
+    var my = seq;
+    if (NX.seq === my && NX.rows) { renderNext(); }
+    else {
+      var base = nxBaseScenario(), step = leverStep(lastReport);
+      var runs = nxRuns(base, step);
+      NX.seq = my; NX.base = JSON.parse(JSON.stringify(base)); NX.step = step; NX.rows = null;
+      NX.basep50 = lastReport.accumulation.p50; NX.saving = savingUsed();
+      NX.times.ladderAsk = performance.now();
+      $("nx").classList.add("stale");
+      nxPost("ladder", { next: true, seq: my, runs: runs }, function (m) {
+        if (m.seq !== seq || !m.ok) return;          // a stale answer never paints over a fresh one
+        NX.times.ladderDone = performance.now();
+        NX.rows = m.runs.map(function (r) {
+          var sc = runs.filter(function (j) { return j.key === r.key; })[0].scenario;
+          return { key: r.key, p10: r.p10, p50: r.p50, p90: r.p90, scenario: sc };
+        });
+        renderNext();
+      });
+    }
+    requestSolve(false);
+  }
+
+  function requestSolve(force) {
+    if (!lastReport || veiled) return;
+    var my = seq, n = nxYears();
+    if (!force && NX.solveSeq === my && NX.solveTag === n && NX.solve) { renderSolve(); return; }
+    var cov = coverageShares(), base = nxBaseScenario();
+    NX.solveSeq = my; NX.solveTag = n; NX.solve = null;
+    NX.times.solveAsk = performance.now();
+    $("nx-rev-body").style.opacity = ".3";
+    nxPost("solve", { next: true, seq: my, tag: n, scenario: base,
+                      solve: { horizons: [n], coverages: [cov[cov.length - 1]] } }, function (m) {
+      if (m.seq !== seq || m.tag !== nxYears() || !m.ok) return;
+      NX.times.solveDone = performance.now();
+      var hit = (m.savingNeeded || [])[0];
+      NX.solve = { years: n, saving: hit ? hit.saving : null,
+                   shown: (hit && hit.saving !== null) ? Math.ceil(hit.saving) : null,
+                   current: savingUsed(), scenario: JSON.parse(JSON.stringify(base)) };
+      renderSolve();
+    });
+  }
+
+  function nxLabel(key) {
+    var a = money(NX.step);
+    if (key === "spend") return t("sooner_spend", { a: a });
+    if (key === "earn") return t("sooner_earn", { a: a });
+    return t("nx_lv_capital", { a: money(NX_CAPITAL) });
+  }
+
+  function renderNext() {
+    $("nx").hidden = false;
+    $("nx").classList.remove("stale");
+    var base = NX.basep50, ul = $("nx-ladder");
+    ul.innerHTML = "";
+    var rows = (NX.rows || []).filter(function (r) { return finite(r.p50) && finite(base); })
+      .map(function (r) { return { key: r.key, p50: Number(r.p50), months: (Number(base) - Number(r.p50)) * 12 }; })
+      .filter(function (r) { return Math.round(Math.abs(r.months) * 52 / 12) >= 1; });
+    /* strongest first */
+    rows.sort(function (x, y) { return y.months - x.months; });
+    NX.shown = rows;
+    $("nx-ladder-sec").hidden = rows.length === 0;
+    var longest = Math.max.apply(null, rows.map(function (x) { return Math.abs(x.months); }).concat([1e-9]));
+    rows.forEach(function (row) {
+      var li = document.createElement("li");
+      if (row.months < 0) li.className = "loss";
+      li.setAttribute("data-key", row.key);
+      li.setAttribute("data-p50", String(row.p50));
+      li.innerHTML = '<span class="sk">' + escapeHtml(nxLabel(row.key)) + "</span>"
+        + '<span class="sd">' + escapeHtml(deltaWords(row.months)) + "</span>"
+        + '<span class="sn">' + escapeHtml(t("nx_lv_term", { span: span(row.p50 * 12) })) + "</span>"
+        + '<i class="rbar" aria-hidden="true"></i>';
+      li.lastChild.style.setProperty("--f", Math.abs(row.months) / longest);
+      ul.appendChild(li);
+    });
+    renderCmp();
+  }
+
+  function renderSolve() {
+    var s = NX.solve;
+    $("nx-rev-body").style.opacity = "";
+    $("nx-years-sfx").textContent = plural(nxYears(), "plural_year");
+    if (!s) return;
+    var ans = $("nx-rev-ans"), gap = $("nx-rev-gap");
+    if (s.saving === null) {
+      ans.innerHTML = nb(tHtml("nx_rev_none", { span: span(s.years * 12) }));
+      gap.textContent = ""; gap.hidden = true;
+      return;
+    }
+    if (s.shown <= 0) {
+      ans.innerHTML = nb(tHtml("nx_rev_zero", {}));
+      gap.textContent = ""; gap.hidden = true;
+      return;
+    }
+    ans.innerHTML = nb(tHtml("nx_rev_answer", { amount: money(s.shown) }));
+    var d = s.shown - s.current;
+    gap.hidden = false;
+    if (Math.abs(d) < 0.5) gap.innerHTML = nb(tHtml("nx_rev_same", {}));
+    else gap.innerHTML = nb(tHtml(d > 0 ? "nx_rev_more" : "nx_rev_less", { amount: money(Math.abs(d)) }));
+  }
+
+  // ---- compare purchases (30.09) ---------------------------------------------
+  /* METHOD (brief 30.09, measured and proved in tools/verify_next.py).
+     A full run with a few hundred dollars changed moves the median term by less than the
+     Monte-Carlo median resolves, and not in proportion: at 2500/1400, +$200 invested today
+     moved it 3.6 days, +$1,000 30 days, +$10,000 363 days. The median is a staircase: it
+     creeps inside a year and jumps about a month and a half each time it crosses a whole
+     year, so a small run reads only the creep, and a run of any size is off by up to one
+     jump. So a small-delta run is never shown. The page takes a RATE from one full run large
+     enough to move the median by about two years (a third of the term when that is shorter,
+     never under half a year) - there one jump is a few per cent - and scales it linearly:
+       one-time, price difference $X   -> days = X * rate_capital, rate from "+$Xr invested today"
+       every N years, difference $X    -> m = X / (12 N) a month less spent and invested, the
+                                          "spend less" lever -> days = m * rate_spend, rate from
+                                          "expenses -$mr, saving +$mr"
+     Xr and mr are sized from the ladder's own +$10,000 and -$step runs. A difference at or
+     above the rate run's own size is not extrapolated: it gets a full run of its own. The
+     reference that proves this is phase-averaged INDEPENDENT full runs in verify_next.py. */
+  var CMP_FREQS = [0, 1, 2, 3, 4, 5, 7, 10], CMP_DEFAULT_FREQ = 1, DAYS_Y = 365.25;
+  NX.cmp = { seq: -1, rates: null, pending: false, direct: {}, directPending: false,
+             results: null, lang: null, touched: false };
+
+  function cmpTargetYears(b) { return Math.min(2, Math.max(0.5, b / 3)); }
+
+  function cmpMonthScenario(m) {
+    var sc = JSON.parse(JSON.stringify(NX.base));
+    sc.expenses_monthly = NX.base.expenses_monthly - m;
+    sc.monthly_saving = NX.base.monthly_saving + moveSaving(m);
+    return sc;
+  }
+  function cmpCapScenario(x) {
+    var sc = JSON.parse(JSON.stringify(NX.base));
+    sc.starting_capital = NX.base.starting_capital + x;
+    return sc;
+  }
+
+  function requestCmpRates() {
+    var C = NX.cmp, my = NX.seq, b = NX.basep50;
+    C.seq = my; C.rates = null; C.direct = {}; C.directPending = false; C.pending = false;
+    if (!finite(b)) { C.rates = { never: true }; return; }
+    b = Number(b);
+    function row(k) { return (NX.rows || []).filter(function (r) { return r.key === k; })[0]; }
+    var cap = row("capital"), sp = row("spend"), runs = [], plan = {}, ty = cmpTargetYears(b);
+    if (cap && finite(cap.p50) && b - cap.p50 > 0) {
+      var r0 = (b - cap.p50) * DAYS_Y / NX_CAPITAL;
+      plan.cap = Math.max(100, Math.round(ty * DAYS_Y / r0 / 100) * 100);
+      runs.push({ key: "cap", scenario: cmpCapScenario(plan.cap) });
+    }
+    if (sp && finite(sp.p50) && b - sp.p50 > 0) {
+      var r1 = (b - sp.p50) * DAYS_Y / NX.step;
+      plan.mon = Math.max(1, Math.min(Math.floor(NX.base.expenses_monthly), Math.round(ty * DAYS_Y / r1)));
+      runs.push({ key: "mon", scenario: cmpMonthScenario(plan.mon) });
+    }
+    if (!runs.length) { C.rates = { none: true }; return; }
+    C.pending = true;
+    NX.times.cmpAsk = performance.now();
+    nxPost("cmp", { next: true, seq: seq, tag: my, runs: runs }, function (m) {
+      if (!m.ok || m.tag !== NX.seq || NX.cmp.seq !== my) return;
+      NX.times.cmpDone = performance.now();
+      var rates = { years: ty, base: b };
+      m.runs.forEach(function (r) {
+        var x = plan[r.key];
+        if (finite(r.p50) && b - r.p50 > 0) rates[r.key] = { x: x, p50: Number(r.p50), rate: (b - r.p50) * DAYS_Y / x };
+      });
+      C.rates = rates; C.pending = false;
+      renderCmp();
+    });
+  }
+
+  function cmpMoney(v) {
+    if (Math.abs(v) >= 10) return money(v);
+    return "$" + v.toLocaleString(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  /* days under 30, weeks under ten weeks, then months, then years and months (the
+     page's own span helper from three months up) */
+  function cmpSpan(days) {
+    if (days < 29.5) { var d = Math.round(days); return num(d, 0) + " " + plural(d, "nx_plural_day"); }
+    if (days < 70) { var w = Math.round(days / 7); return num(w, 0) + " " + plural(w, "plural_week"); }
+    var mo = days / (DAYS_Y / 12);
+    if (mo < 3) { var mm = Math.round(mo); return num(mm, 0) + " " + plural(mm, "plural_month"); }
+    return spanYM(mo);
+  }
+  function cmpEvery(n) { return n === 1 ? raw("nx_cmp_every1") : t("nx_cmp_everyn", { n: n, years: plural(n, "plural_year") }); }
+  function cmpFreq() { var v = parseInt($("nx-cmp-freq").value, 10); return isNaN(v) ? CMP_DEFAULT_FREQ : v; }
+
+  function cmpInit() {
+    var C = NX.cmp;
+    if (C.lang === LANG) return;
+    var sel = $("nx-cmp-freq"), keep = sel.options.length ? cmpFreq() : CMP_DEFAULT_FREQ;
+    sel.innerHTML = "";
+    CMP_FREQS.forEach(function (n) {
+      var o = document.createElement("option");
+      o.value = String(n); o.textContent = n === 0 ? raw("nx_cmp_once") : cmpEvery(n);
+      if (n === keep) o.selected = true;
+      sel.appendChild(o);
+    });
+    var rows = document.querySelectorAll("#nx-cmp-sec .cmprow");
+    for (var i = 0; i < rows.length; i++) {
+      var nm = rows[i].querySelector(".cmpname"), pr = rows[i].querySelector(".cmpprice");
+      nm.setAttribute("aria-label", t("nx_cmp_name_aria", { n: i + 1 }));
+      nm.placeholder = t("nx_cmp_opt", { n: i + 1 });
+      pr.setAttribute("aria-label", t("nx_cmp_price_aria", { n: i + 1 }));
+      pr.placeholder = raw("nx_cmp_price_ph");
+    }
+    /* no prefilled example (CEO 30.09): names show "Example N" as placeholders, prices start empty */
+    C.lang = LANG;
+  }
+
+  function cmpOptions() {
+    var rows = document.querySelectorAll("#nx-cmp-sec .cmprow"), out = [];
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].hidden) continue;
+      var name = rows[i].querySelector(".cmpname").value.trim();
+      var price = parseFloat(rows[i].querySelector(".cmpprice").value);
+      if (!(price > 0)) continue;
+      out.push({ i: i, name: name || t("nx_cmp_opt", { n: i + 1 }), price: price });
+    }
+    return out;
+  }
+
+  /* one line of the result: from the rate, or from a full run of its own when the amount
+     is at or above the rate run's size; null while that run is still being counted */
+  function cmpDays(kind, x, need) {
+    var R = NX.cmp.rates && NX.cmp.rates[kind];
+    if (!R || !(x > 0)) return { days: null, method: "none" };
+    if (x < R.x) return { days: x * R.rate, method: "scaled", rate: R.rate, from: R.x };
+    var key = kind + ":" + x.toFixed(2), p = NX.cmp.direct[key];
+    if (p === undefined) { need.push({ key: key, kind: kind, x: x }); return { days: null, method: "direct" }; }
+    return { days: finite(p) ? (NX.cmp.rates.base - Number(p)) * DAYS_Y : null, method: "direct", p50: p };
+  }
+
+  function cmpLine(cls, key, vars) {
+    var h = nb(tHtml(key, vars));
+    if (vars.every) h = h.replace('<span class="fig">' + escapeHtml(vars.every) + "</span>", escapeHtml(vars.every));
+    return '<p class="' + cls + '">' + h + "</p>";
+  }
+
+  function renderCmp() {
+    var C = NX.cmp, out = $("nx-cmp-out");
+    cmpInit();
+    var bc = document.body.classList;       // "collapse" is offered once there is something to fold
+    $("in-fold").hidden = !(bc.contains("view-cmp") && !bc.contains("in-closed") && !veiled && !!lastReport);
+    if (veiled || !lastReport) {                  // no headline yet: nothing to compare against
+      C.results = null;
+      out.innerHTML = '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_fill")) + "</p>";
+      return;
+    }
+    if (!NX.base || NX.seq < 0) { out.innerHTML = '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_wait")) + "</p>"; return; }
+    if (!NX.rows) { out.innerHTML = '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_wait")) + "</p>"; return; }
+    if (C.seq !== NX.seq) requestCmpRates();
+    var opts = cmpOptions(), n = cmpFreq();
+    C.results = null;
+    if (opts.length < 2) { out.innerHTML = '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_need2")) + "</p>"; return; }
+    var top = opts[0];
+    opts.forEach(function (o) { if (o.price > top.price) top = o; });
+    var others = opts.filter(function (o) { return o !== top; });
+    if (C.pending || !C.rates) { out.innerHTML = '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_wait")) + "</p>"; return; }
+    var never = !!C.rates.never, need = [], html = "", res = [];
+    if (never) html += '<p class="cmpmsg">' + escapeHtml(raw("nx_cmp_never")) + "</p>";
+    others.forEach(function (o) {
+      var diff = top.price - o.price, r = { a: top.name, b: o.name, diff: diff, freq: n };
+      html += '<div class="cmpres" data-i="' + o.i + '">'
+        + '<p class="cmpvs">' + escapeHtml(t("nx_cmp_vs", { a: top.name, b: o.name })) + "</p>";
+      if (diff <= 0) {
+        html += '<p class="cmpmsg">' + escapeHtml(t("nx_cmp_same", { a: top.name, b: o.name })) + "</p></div>";
+        r.same = true; res.push(r); return;
+      }
+      var amt = "-" + cmpMoney(diff), m = n ? diff / (12 * n) : 0;
+      if (never) {
+        /* money kept reads without a minus; no per-month figure on screen (CEO 30.09) */
+        if (n) html += cmpLine("cmpbig", "nx_cmp_keep_every", { amount: cmpMoney(diff), every: cmpEvery(n) });
+        else html += cmpLine("cmpbig", "nx_cmp_keep", { amount: cmpMoney(diff) });
+        r.once = { x: diff }; if (n) r.habit = { m: m };
+      } else {
+        html += '<span class="cmplab">' + escapeHtml(raw("nx_cmp_now")) + "</span>";
+        var one = cmpDays("cap", diff, need); r.once = one; one.x = diff;
+        if (one.method === "none") html += "";
+        else if (one.days === null) html += '<p class="cmpbig">' + escapeHtml(raw("nx_cmp_wait")) + "</p>";
+        else if (one.days < 0.5) html += cmpLine("cmpbig", "nx_cmp_big_lt", { amount: amt });
+        else html += cmpLine("cmpbig", "nx_cmp_big", { amount: amt, span: cmpSpan(one.days) });
+        if (n) {
+          /* the habit is worked out per month (m) underneath; the line shows only the cadence (CEO 30.09) */
+          var hb = cmpDays("mon", m, need); hb.m = m; r.habit = hb;
+          if (hb.method === "none") html += "";
+          else if (hb.days === null) html += '<p class="cmpbig cmphabit">' + escapeHtml(raw("nx_cmp_wait")) + "</p>";
+          else if (hb.days < 0.5) html += cmpLine("cmpbig cmphabit", "nx_cmp_habit_line_lt", { every: cmpEvery(n) });
+          else html += cmpLine("cmpbig cmphabit", "nx_cmp_habit_line", { every: cmpEvery(n), span: cmpSpan(hb.days) });
+        }
+      }
+      html += "</div>";
+      res.push(r);
+    });
+    out.innerHTML = html;
+    var blocks = out.querySelectorAll(".cmpres");
+    res.forEach(function (r, k) { r.text = blocks[k] ? blocks[k].textContent : ""; });
+    C.results = res;
+    if (need.length && !C.directPending) {
+      var my = C.seq;
+      C.directPending = true;
+      nxPost("cmpd", { next: true, seq: seq, tag: my, runs: need.map(function (q) {
+        return { key: q.key, scenario: q.kind === "cap" ? cmpCapScenario(q.x) : cmpMonthScenario(Math.min(q.x, NX.base.expenses_monthly)) };
+      }) }, function (mm) {
+        C.directPending = false;
+        if (!mm.ok || mm.tag !== C.seq) return;
+        mm.runs.forEach(function (q) { C.direct[q.key] = q.p50; });
+        renderCmp();
+      });
+    }
+  }
+
+  (function () {
+    $("nx-years").addEventListener("input", function () {
+      $("nx-years-sfx").textContent = plural(nxYears(), "plural_year");
+      if (nxTimer) clearTimeout(nxTimer);
+      nxTimer = setTimeout(function () { requestSolve(false); }, 300);
+    });
+    $("nx-years").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); this.blur(); } });
+    /* compare purchases: typing re-reads the options; the rate runs are per result, so
+       only a difference at or above the rate run's size ever asks for a new run */
+    var cmpSec = $("nx-cmp-sec");
+    function cmpInput() {
+      NX.cmp.touched = true;
+      if (cmpTimer) clearTimeout(cmpTimer);
+      cmpTimer = setTimeout(renderCmp, 250);
+    }
+    cmpSec.addEventListener("input", cmpInput);
+    cmpSec.addEventListener("change", cmpInput);
+    cmpSec.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); e.target.blur(); }
+    });
+    /* the two tabs. The main tab is the page exactly as before; the compare tab keeps the
+       inputs and shows only the compare block. Everything of the main answer keeps rendering
+       while hidden, and on the way back a resize re-measures the path, the curve and the card. */
+    var views = document.querySelectorAll('input[name="view"]');
+    for (var v = 0; v < views.length; v++) {
+      views[v].addEventListener("change", function () {
+        if (!this.checked) return;
+        var cmp = this.value === "cmp";
+        document.body.classList.toggle("view-cmp", cmp);
+        cmpSec.hidden = !cmp;
+        inFold(cmp && !veiled && !!lastReport);     // empty inputs stay open: nothing to fold
+        if (cmp) renderCmp();
+        else { try { window.dispatchEvent(new Event("resize")); } catch (e) { /* old engines */ } drawCardWhenReady(); }
+      });
+    }
+    function inFold(closed) {
+      if (closed) $("in-summary-text").textContent = t("nx_in_sum", { income: money(numOf("in-income")), expenses: money(numOf("in-expenses")) });
+      document.body.classList.toggle("in-closed", closed);
+      var inCmp = document.body.classList.contains("view-cmp");
+      $("in-summary").hidden = !(inCmp && closed);
+      $("in-fold").hidden = !(inCmp && !closed && !veiled && !!lastReport);
+    }
+    $("in-summary").addEventListener("click", function () {
+      inFold(false);
+      try { $("in-income").focus({ preventScroll: true }); } catch (e) { /* fine */ }
+    });
+    $("in-fold").addEventListener("click", function () { inFold(true); });
+    $("nx-cmp-add").addEventListener("click", function () {
+      var hid = cmpSec.querySelector(".cmprow[hidden]");
+      if (hid) { hid.hidden = false; try { hid.querySelector(".cmpname").focus(); } catch (e) { /* fine */ } }
+      if (!cmpSec.querySelector(".cmprow[hidden]")) this.hidden = true;
+    });
+  })();
+
   // ---- the card ------------------------------------------------------------
   /* The card on the page IS the canvas that gets downloaded, so the image cannot
      drift from what is shown: there is one drawing, and the file is its pixels.
@@ -4114,9 +4879,13 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
       return c;
     }
 
-    setFont(ctx, "300 36px", CARD_DISP, "0px");
+    /* CEO 30.09: the positive frame - the number as the moment work can stop for good.
+       No money and no range on this card. */
+    var psize = 36;
+    do { setFont(ctx, "300 " + psize + "px", CARD_DISP, "0px"); psize -= 1; }
+    while (psize > 24 && ctx.measureText(raw("nx_card_pre")).width > X1 - X0);
     ctx.fillStyle = C_HI;
-    ctx.fillText(m.pre, X0, 196);
+    ctx.fillText(raw("nx_card_pre"), X0, 196);
     setFont(ctx, "100 300px", CARD_TEXT, "-13px");
     ctx.save();
     ctx.shadowColor = "rgba(" + C_GLOW + ",.5)"; ctx.shadowBlur = 60;
@@ -4126,9 +4895,15 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     var nw = ctx.measureText(m.numText).width;
     var size = 54, ux = X0 - 14 + nw + 30;
     do { setFont(ctx, "300 " + size + "px", CARD_DISP, "0px"); size -= 2; }
-    while (size > 22 && ux + ctx.measureText(m.unit).width > X1);
+    while (size > 22 && ux + ctx.measureText(m.spanUnit).width > X1);
     ctx.fillStyle = C_HI;
-    ctx.fillText(m.unit, ux, 436);
+    ctx.fillText(m.spanUnit, ux, 436);
+    /* the closing line sits UNDER the path line, clear of the glow above it (CEO 30.09) */
+    var asize = 28;
+    do { setFont(ctx, "300 " + asize + "px", CARD_DISP, "0px"); asize -= 1; }
+    while (asize > 18 && ctx.measureText(raw("nx_card_ask")).width > X1 - X0);
+    ctx.fillStyle = C_MID;
+    ctx.fillText(raw("nx_card_ask"), X0, 604);
     return c;
   }
 
@@ -4138,11 +4913,11 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     var m = lastHero;
     drawCard();
     if (!m) return;
-    $("card-canvas").setAttribute("aria-label", m.head);
+    $("card-canvas").setAttribute("aria-label", m.never ? m.head : m.cardLine);
     setShareLink();
     if (!document.fonts || !document.fonts.load) return;
     var my = ++cardSeq;
-    var txt = [m.identity.toUpperCase(), m.badge, m.head, m.range || ""].join(" ");
+    var txt = [m.identity.toUpperCase(), m.badge, m.head, m.range || "", raw("nx_card_pre"), raw("nx_card_ask"), m.spanUnit || ""].join(" ");
     var wants = [["300 36px " + CARD_DISP, txt], ["400 19px " + CARD_DISP, txt],
                  ["100 300px " + CARD_TEXT, "0123456789"], ["300 25px " + CARD_TEXT, txt],
                  ["400 17px " + CARD_TEXT, txt]];
@@ -4175,7 +4950,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
   function setShareLink() {
     var m = lastHero, a = $("card-x");
     if (!m) return;
-    var text = m.never ? m.head : t("card_tweet", { n: m.numText, years: m.unit });
+    var text = m.never ? m.head : m.cardLine;
     a.href = "https://x.com/intent/post?text=" + encodeURIComponent(text)
       + (SHARE_URL ? "&url=" + encodeURIComponent(SHARE_URL) : "");
   }
@@ -4200,7 +4975,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = FI;
     b.addEventListener("click", function () {
       var c = drawCard(), m = lastHero;
       if (!c || !m) return;
-      var text = m.never ? m.head : t("card_tweet", { n: m.numText, years: m.unit });
+      var text = m.never ? m.head : m.cardLine;
       c.toBlob(function (blob) {
         if (!blob) return;
         var data = { files: [new File([blob], "financial-freedom.png", { type: "image/png" })], text: text + (SHARE_URL ? " " + SHARE_URL : "") };
